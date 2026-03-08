@@ -6,7 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { QRDisplay } from '@/components/QRDisplay';
-import { Loader2, Plus, LogOut, Mic, ExternalLink } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Loader2, Plus, LogOut, Mic, ExternalLink, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Session {
@@ -27,6 +38,8 @@ export default function AdminHome() {
   const [speakingTime, setSpeakingTime] = useState(30);
   const [showCreate, setShowCreate] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -84,6 +97,25 @@ export default function AdminHome() {
     setShowCreate(false);
     setCreating(false);
     toast.success('Session created!');
+  };
+
+  const deleteSession = async (sessionId: string) => {
+    setDeleting(true);
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (error) {
+      toast.error('Failed to delete session');
+      setDeleting(false);
+      return;
+    }
+
+    setSessions(prev => prev.filter(s => s.id !== sessionId));
+    setDeleteConfirm(null);
+    setDeleting(false);
+    toast.success('Session deleted');
   };
 
   const handleLogout = async () => {
@@ -203,15 +235,46 @@ export default function AdminHome() {
                     </div>
 
                     {/* Actions */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => navigate(`/admin/${s.id}?code=${s.admin_code}`)}
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                      Open Dashboard
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => navigate(`/admin/${s.id}?code=${s.admin_code}`)}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                        Open Dashboard
+                      </Button>
+                      <AlertDialog open={deleteConfirm === s.id} onOpenChange={(open) => setDeleteConfirm(open ? s.id : null)}>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete session?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete "{s.title}" and all associated data. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteSession(s.id)}
+                              disabled={deleting}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {deleting ? 'Deleting...' : 'Delete'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
