@@ -23,34 +23,59 @@ export function useAudioRecorder(sessionId: string | undefined) {
 
     chunksRef.current = [];
     
-    // Try preferred codec, fall back if not supported
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm';
+    // Try different codecs in order of preference
+    const mimeTypes = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/mp4',
+      ''
+    ];
     
-    const recorder = new MediaRecorder(stream, { mimeType });
-
-    recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunksRef.current.push(e.data);
-    };
-
-    recorder.onstop = async () => {
-      const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-      const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
-      if (blob.size > 0) {
-        await uploadRecording(blob, speakerName, duration);
+    let mimeType = '';
+    for (const type of mimeTypes) {
+      if (type === '' || MediaRecorder.isTypeSupported(type)) {
+        mimeType = type;
+        break;
       }
-      chunksRef.current = [];
-      setIsRecording(false);
-      setCurrentRecordingSpeaker(null);
-    };
+    }
+    
+    try {
+      const recorderOptions = mimeType ? { mimeType } : undefined;
+      const recorder = new MediaRecorder(stream, recorderOptions);
 
-    mediaRecorderRef.current = recorder;
-    startTimeRef.current = Date.now();
-    recorder.start(1000);
-    setIsRecording(true);
-    setCurrentRecordingSpeaker(speakerName);
-    console.log('Recording started for:', speakerName);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: mimeType || 'audio/webm' });
+        const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
+        if (blob.size > 0) {
+          await uploadRecording(blob, speakerName, duration);
+        }
+        chunksRef.current = [];
+        setIsRecording(false);
+        setCurrentRecordingSpeaker(null);
+      };
+
+      recorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+        toast.error('Recording failed');
+        setIsRecording(false);
+        setCurrentRecordingSpeaker(null);
+      };
+
+      mediaRecorderRef.current = recorder;
+      startTimeRef.current = Date.now();
+      recorder.start(1000);
+      setIsRecording(true);
+      setCurrentRecordingSpeaker(speakerName);
+      console.log('Recording started for:', speakerName, 'with mimeType:', mimeType);
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+      toast.error('Could not start recording - check microphone permissions');
+    }
   }, [sessionId]);
 
   const stopRecording = useCallback(() => {
