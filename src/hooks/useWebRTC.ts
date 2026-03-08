@@ -47,6 +47,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const filtersRef = useRef<Record<EQBand, BiquadFilterNode | null>>({ bass: null, mid: null, treble: null });
+  const remoteStreamRef = useRef<MediaStream | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
@@ -233,6 +234,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       pc.ontrack = (e) => {
         const audio = helpersRef.current.createAudioElement();
         audio.srcObject = e.streams[0];
+        remoteStreamRef.current = e.streams[0];
         // Connect through EQ pipeline if not already connected
         if (!sourceNodeRef.current) {
           connectAudioPipeline(audio);
@@ -397,5 +399,5 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
 
-  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef, setEQ };
+  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef, remoteStreamRef, setEQ };
 }

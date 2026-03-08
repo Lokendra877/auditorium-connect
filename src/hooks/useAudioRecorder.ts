@@ -9,34 +9,27 @@ export function useAudioRecorder(sessionId: string | undefined) {
   const [currentRecordingSpeaker, setCurrentRecordingSpeaker] = useState<string | null>(null);
   const startTimeRef = useRef<number>(0);
 
-  const startRecording = useCallback((audioElement: HTMLAudioElement | null, speakerName: string) => {
-    if (!audioElement || !sessionId) return;
+  const startRecording = useCallback((stream: MediaStream | null, speakerName: string) => {
+    if (!stream || !sessionId) return;
 
-    try {
-      // Get the media stream from the audio element
-      const stream = (audioElement as any).captureStream?.() || (audioElement as any).mozCaptureStream?.();
-      if (!stream) {
-        // Fallback: try to capture from srcObject
-        const srcStream = audioElement.srcObject as MediaStream;
-        if (!srcStream) {
-          console.warn('No stream available to record');
-          return;
-        }
-        startRecordingFromStream(srcStream, speakerName);
-        return;
-      }
-      startRecordingFromStream(stream, speakerName);
-    } catch (err) {
-      console.warn('Failed to start recording:', err);
+    // Check if stream has audio tracks
+    const audioTracks = stream.getAudioTracks();
+    if (audioTracks.length === 0) {
+      console.warn('No audio tracks available to record');
+      return;
     }
-  }, [sessionId]);
 
-  const startRecordingFromStream = useCallback((stream: MediaStream, speakerName: string) => {
     if (mediaRecorderRef.current?.state === 'recording') return;
 
     chunksRef.current = [];
-    const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
     
+    // Try preferred codec, fall back if not supported
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+    
+    const recorder = new MediaRecorder(stream, { mimeType });
+
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
@@ -44,7 +37,9 @@ export function useAudioRecorder(sessionId: string | undefined) {
     recorder.onstop = async () => {
       const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
       const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
-      await uploadRecording(blob, speakerName, duration);
+      if (blob.size > 0) {
+        await uploadRecording(blob, speakerName, duration);
+      }
       chunksRef.current = [];
       setIsRecording(false);
       setCurrentRecordingSpeaker(null);
@@ -52,14 +47,16 @@ export function useAudioRecorder(sessionId: string | undefined) {
 
     mediaRecorderRef.current = recorder;
     startTimeRef.current = Date.now();
-    recorder.start(1000); // collect data every second
+    recorder.start(1000);
     setIsRecording(true);
     setCurrentRecordingSpeaker(speakerName);
+    console.log('Recording started for:', speakerName);
   }, [sessionId]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop();
+      console.log('Recording stopped');
     }
   }, []);
 
@@ -78,7 +75,6 @@ export function useAudioRecorder(sessionId: string | undefined) {
       return;
     }
 
-    // Save metadata
     const { error: dbError } = await supabase
       .from('audio_recordings')
       .insert({
