@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
@@ -19,6 +19,11 @@ export default function SessionPage() {
   const { requestToSpeak, deviceId } = useQueueActions(sessionId);
   const [userName, setUserName] = useState('');
   const [hasJoined, setHasJoined] = useState(false);
+
+  // Compute speaking status before hooks (hooks must be called unconditionally)
+  const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
+  const amISpeaking = myEntry?.status === 'speaking' ?? false;
+  const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
   if (loading) {
     return (
@@ -55,9 +60,6 @@ export default function SessionPage() {
   }
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
-  const myEntry = queue.find(e => e.device_id === deviceId);
-  const amISpeaking = myEntry?.status === 'speaking';
-  const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
   const waitingQueue = queue.filter(e => e.status === 'waiting');
   const myPosition = myEntry && myEntry.status === 'waiting'
     ? waitingQueue.findIndex(e => e.id === myEntry.id) + 1
