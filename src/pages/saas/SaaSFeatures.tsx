@@ -32,22 +32,23 @@ const features = [
 export default function SaaSFeatures() {
   return (
     <SaaSLayout>
-      {/* Hero Image */}
-      <section className="py-12 px-4">
-        <div className="container mx-auto max-w-5xl">
+      {/* Hero with background image */}
+      <section className="relative overflow-hidden py-24 px-4">
+        <div className="absolute inset-0">
+          <img src={lectureHallImage} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+        </div>
+        <div className="container mx-auto max-w-5xl relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            <div className="relative rounded-3xl overflow-hidden shadow-colored border-2 border-primary/20">
-              <img 
-                src={lectureHallImage} 
-                alt="Interactive lecture hall with engaged students" 
-                className="w-full h-auto object-cover rounded-3xl"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
-            </div>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Features Built for Scale</h1>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+              Everything your institution needs to run professional, organized auditorium sessions.
+            </p>
           </motion.div>
         </div>
       </section>
@@ -55,12 +56,6 @@ export default function SaaSFeatures() {
       {/* Features Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <motion.div {...fadeUp} className="text-center mb-16">
-            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Features Built for Scale</h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Everything your institution needs to run professional, organized auditorium sessions.
-            </p>
-          </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {features.map((f, i) => (
