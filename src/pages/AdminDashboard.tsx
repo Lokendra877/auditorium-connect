@@ -12,6 +12,7 @@ import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { AudioEqualizer } from '@/components/AudioEqualizer';
+import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { AdminPollCreator } from '@/components/AdminPollCreator';
 import { AdminQuestionsList } from '@/components/AdminQuestionsList';
 import { AdminPollResults } from '@/components/AdminPollResults';
@@ -44,7 +45,7 @@ export default function AdminDashboard() {
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel, analyserRef } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
   const [recordings, setRecordings] = useState<any[]>([]);
@@ -188,6 +189,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
+            <AudioVisualizer analyserNode={analyserRef.current} isReceiving={isReceiving} />
             <AudioEqualizer onEQChange={setEQ} onVolumeChange={setAudioVolume} enhancements={enhancements} onEnhancementChange={updateEnhancement} inputLevel={inputLevel} />
             <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
             <LiveSubtitles originalText={subtitle} translatedText={translatedSubtitle} isTranslating={isTranslating} targetLanguage={targetLanguage} ttsEnabled={ttsEnabled} onToggleTts={() => setTtsEnabled(prev => !prev)} />
