@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText, Timer, Plus } from 'lucide-react';
+import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText, Timer, Plus, Trash2 } from 'lucide-react';
 import { usePollCountdown, formatCountdown, calcProgressPercent } from '@/hooks/usePollCountdown';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
@@ -139,6 +139,17 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     }
   };
 
+  const deletePoll = async (pollId: string) => {
+    // Delete votes first, then the poll
+    await supabase.from('poll_votes').delete().eq('poll_id', pollId);
+    const { error } = await supabase.from('session_polls').delete().eq('id', pollId);
+    if (error) {
+      toast.error('Failed to delete poll');
+    } else {
+      toast.success('Poll deleted');
+    }
+  };
+
   if (polls.length === 0) {
     return (
       <div className="text-center py-6 text-muted-foreground text-sm">
@@ -161,6 +172,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
             closePoll={closePoll}
             reopenPoll={reopenPoll}
             extendTimer={extendTimer}
+            deletePoll={deletePoll}
           />
         ))}
       </AnimatePresence>
@@ -168,8 +180,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
   );
 }
 
-function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, closePoll, reopenPoll, extendTimer }: {
-  poll: Poll; pollVotes: Record<string, VoteDetail[]>; expandedPoll: string | null; setExpandedPoll: (id: string | null) => void; closing: string | null; closePoll: (id: string) => void; reopenPoll: (id: string) => void; extendTimer: (id: string, seconds: number) => void;
+function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, closePoll, reopenPoll, extendTimer, deletePoll }: {
+  poll: Poll; pollVotes: Record<string, VoteDetail[]>; expandedPoll: string | null; setExpandedPoll: (id: string | null) => void; closing: string | null; closePoll: (id: string) => void; reopenPoll: (id: string) => void; extendTimer: (id: string, seconds: number) => void; deletePoll: (id: string) => void;
 }) {
   const countdown = usePollCountdown(poll.id, poll.closes_at, poll.is_active);
   const progressPct = poll.closes_at ? calcProgressPercent(poll.closes_at, poll.created_at) : null;
@@ -296,6 +308,16 @@ function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, clo
                 </Button>
               </>
             )}
+
+            {/* Delete poll */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => { if (confirm('Delete this poll and all its votes?')) deletePoll(poll.id); }}
+            >
+              <Trash2 className="w-3 h-3" /> Delete
+            </Button>
 
             {/* Export CSV */}
             {totalVotes > 0 && (
