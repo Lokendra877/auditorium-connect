@@ -22,6 +22,7 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 export function AdminNotifications() {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
