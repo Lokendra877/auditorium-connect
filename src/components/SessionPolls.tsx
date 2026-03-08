@@ -5,8 +5,9 @@ import { getDeviceId } from '@/lib/device-id';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BarChart3, Check, Send } from 'lucide-react';
+import { BarChart3, Check, Send, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePollCountdown, formatCountdown } from '@/hooks/usePollCountdown';
 
 interface Poll {
   id: string;
