@@ -1,9 +1,12 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -12,9 +15,21 @@ const fadeUp = {
   transition: { duration: 0.5 },
 };
 
+const TIERS = {
+  basic: {
+    price_id: 'price_1T8jpBFRxLdX1frRfYCLNpA8',
+    product_id: 'prod_U6xkJqQPf2PI8w',
+  },
+  standard: {
+    price_id: 'price_1T8jpuFRxLdX1frRYaoeeLFy',
+    product_id: 'prod_U6xlpta74qImWO',
+  },
+};
+
 const plans = [
   {
     name: 'Basic',
+    tier: 'basic' as const,
     price: '$29',
     period: '/month',
     desc: 'Perfect for single-room setups.',
@@ -29,6 +44,7 @@ const plans = [
   },
   {
     name: 'Standard',
+    tier: 'standard' as const,
     price: '$79',
     period: '/month',
     desc: 'For institutions with multiple halls.',
@@ -45,6 +61,7 @@ const plans = [
   },
   {
     name: 'Enterprise',
+    tier: null,
     price: 'Custom',
     period: '',
     desc: 'For large-scale deployments.',
@@ -62,6 +79,73 @@ const plans = [
 ];
 
 export default function SaaSPricing() {
+  const [searchParams] = useSearchParams();
+  const [loading, setLoading] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<{ subscribed: boolean; product_id: string | null }>({ subscribed: false, product_id: null });
+
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      toast.success('Subscription activated successfully!');
+    }
+    if (searchParams.get('canceled') === 'true') {
+      toast.info('Checkout was canceled.');
+    }
+    checkSubscription();
+  }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (!error && data) {
+        setSubscription({ subscribed: data.subscribed, product_id: data.product_id });
+      }
+    } catch {}
+  };
+
+  const handleSubscribe = async (tier: 'basic' | 'standard') => {
+    setLoading(tier);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please log in first to subscribe.');
+        setLoading(null);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId: TIERS[tier].price_id },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to start checkout');
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to open subscription portal');
+    }
+  };
+
+  const isCurrentPlan = (tier: string | null) => {
+    if (!subscription.subscribed || !tier) return false;
+    return subscription.product_id === TIERS[tier as keyof typeof TIERS]?.product_id;
+  };
+
   return (
     <SaaSLayout>
       <section className="py-20">
@@ -77,11 +161,18 @@ export default function SaaSPricing() {
             {plans.map((plan, i) => (
               <motion.div key={plan.name} {...fadeUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
                 <Card className={`relative overflow-hidden h-full ${
-                  plan.popular 
-                    ? 'border-2 border-primary shadow-[var(--shadow-lg)]' 
-                    : 'border shadow-[var(--shadow-sm)]'
+                  isCurrentPlan(plan.tier)
+                    ? 'border-2 border-success shadow-[var(--shadow-lg)]'
+                    : plan.popular 
+                      ? 'border-2 border-primary shadow-[var(--shadow-lg)]' 
+                      : 'border shadow-[var(--shadow-sm)]'
                 }`}>
-                  {plan.popular && (
+                  {isCurrentPlan(plan.tier) && (
+                    <div className="absolute top-0 right-0 bg-success text-success-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
+                      Your Plan
+                    </div>
+                  )}
+                  {plan.popular && !isCurrentPlan(plan.tier) && (
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
                       Most Popular
                     </div>
@@ -103,19 +194,26 @@ export default function SaaSPricing() {
                         </li>
                       ))}
                     </ul>
-                    <Link to={plan.name === 'Enterprise' ? '/contact' : '/saas-login?mode=signup'}>
+                    {plan.tier === null ? (
+                      <Link to="/contact">
+                        <Button variant="outline" size="lg" className="w-full">Contact Sales</Button>
+                      </Link>
+                    ) : isCurrentPlan(plan.tier) ? (
+                      <Button variant="outline" size="lg" className="w-full" onClick={handleManageSubscription}>
+                        Manage Subscription
+                      </Button>
+                    ) : (
                       <Button
-                        className={`w-full ${
-                          plan.popular
-                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                            : ''
-                        }`}
+                        className={`w-full ${plan.popular ? 'bg-primary text-primary-foreground hover:bg-primary/90' : ''}`}
                         variant={plan.popular ? 'default' : 'outline'}
                         size="lg"
+                        disabled={loading === plan.tier}
+                        onClick={() => handleSubscribe(plan.tier!)}
                       >
-                        {plan.name === 'Enterprise' ? 'Contact Sales' : 'Subscribe Now'}
+                        {loading === plan.tier ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        Subscribe Now
                       </Button>
-                    </Link>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Mail, Phone, Building2, User, Send } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function SaaSContact() {
   const [form, setForm] = useState({
@@ -18,18 +19,42 @@ export default function SaaSContact() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.institution || !form.email || !form.contact) {
       toast.error('Please fill in the required fields.');
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      // Save demo request to database
+      const { error } = await supabase.from('demo_requests').insert({
+        institution_name: form.institution,
+        contact_person: form.contact,
+        email: form.email,
+        phone: form.phone || null,
+        num_auditoriums: form.auditoriums || null,
+      });
+
+      if (error) throw error;
+
+      // Send admin notification
+      await supabase.functions.invoke('notify-admin', {
+        body: {
+          type: 'demo_request',
+          title: 'New Demo Request',
+          message: `${form.contact} from ${form.institution} (${form.email}) requested a demo for ${form.auditoriums || '?'} auditorium(s).`,
+          metadata: { institution: form.institution, email: form.email, contact: form.contact },
+        },
+      });
+
       toast.success('Demo request submitted! We will contact you within 24 hours.');
       setForm({ institution: '', contact: '', email: '', phone: '', auditoriums: '' });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to submit. Please try again.');
+    } finally {
       setSubmitting(false);
-    }, 1200);
+    }
   };
 
   return (
