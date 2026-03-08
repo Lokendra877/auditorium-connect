@@ -38,6 +38,18 @@ type SignalMessage = {
 
 export type EQBand = 'bass' | 'mid' | 'treble';
 
+export interface AudioEnhancementSettings {
+  noiseSuppression: boolean;
+  echoCancellation: boolean;
+  autoGainControl: boolean;
+}
+
+const DEFAULT_ENHANCEMENTS: AudioEnhancementSettings = {
+  noiseSuppression: true,
+  echoCancellation: true,
+  autoGainControl: true,
+};
+
 export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const deviceId = getDeviceId();
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -47,12 +59,22 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const filtersRef = useRef<Record<EQBand, BiquadFilterNode | null>>({ bass: null, mid: null, treble: null });
+  const compressorRef = useRef<DynamicsCompressorNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
+  const [enhancements, setEnhancements] = useState<AudioEnhancementSettings>(DEFAULT_ENHANCEMENTS);
+  const [inputLevel, setInputLevel] = useState(0);
   const isSpeakingRef = useRef(isSpeaking);
   const mountedRef = useRef(true);
+  const enhancementsRef = useRef(enhancements);
+
+  useEffect(() => {
+    enhancementsRef.current = enhancements;
+  }, [enhancements]);
 
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
@@ -72,6 +94,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       const ctx = new AudioContext();
       audioContextRef.current = ctx;
 
+      // EQ filters
       const bass = ctx.createBiquadFilter();
       bass.type = 'lowshelf';
       bass.frequency.value = 200;
@@ -89,6 +112,26 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       treble.gain.value = 0;
 
       filtersRef.current = { bass, mid, treble };
+
+      // Dynamics compressor for auto-leveling
+      const compressor = ctx.createDynamicsCompressor();
+      compressor.threshold.value = -24;
+      compressor.knee.value = 12;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
+      compressorRef.current = compressor;
+
+      // Output gain for volume normalization
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = 1.0;
+      gainNodeRef.current = gainNode;
+
+      // Analyser for level metering
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      analyserRef.current = analyser;
     }
     return audioContextRef.current;
   };
@@ -97,7 +140,6 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     const ctx = initAudioContext();
     if (ctx.state === 'suspended') ctx.resume();
 
-    // Avoid creating duplicate source nodes
     if (sourceNodeRef.current) {
       try { sourceNodeRef.current.disconnect(); } catch {}
     }
@@ -105,19 +147,68 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     const source = ctx.createMediaElementSource(audioEl);
     sourceNodeRef.current = source;
     const { bass, mid, treble } = filtersRef.current;
-    if (bass && mid && treble) {
+    const compressor = compressorRef.current;
+    const gainNode = gainNodeRef.current;
+    const analyser = analyserRef.current;
+
+    if (bass && mid && treble && compressor && gainNode && analyser) {
+      // Chain: source -> bass -> mid -> treble -> compressor -> gain -> analyser -> destination
       source.connect(bass);
       bass.connect(mid);
       mid.connect(treble);
-      treble.connect(ctx.destination);
+      treble.connect(compressor);
+      compressor.connect(gainNode);
+      gainNode.connect(analyser);
+      analyser.connect(ctx.destination);
     } else {
       source.connect(ctx.destination);
     }
+
+    // Start level metering
+    startLevelMetering();
+  };
+
+  const startLevelMetering = () => {
+    const analyser = analyserRef.current;
+    if (!analyser) return;
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    const tick = () => {
+      if (!mountedRef.current || !analyserRef.current) return;
+      analyser.getByteFrequencyData(dataArray);
+      const avg = dataArray.reduce((sum, v) => sum + v, 0) / dataArray.length;
+      safeSet(setInputLevel, Math.round((avg / 255) * 100));
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   };
 
   const setEQ = (band: EQBand, gainDb: number) => {
     const filter = filtersRef.current[band];
     if (filter) filter.gain.value = gainDb;
+  };
+
+  const setVolume = (value: number) => {
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = Math.max(0, Math.min(2, value));
+    }
+  };
+
+  const updateEnhancement = (key: keyof AudioEnhancementSettings, value: boolean) => {
+    setEnhancements(prev => ({ ...prev, [key]: value }));
+    // Apply to active stream if exists
+    if (localStreamRef.current) {
+      const track = localStreamRef.current.getAudioTracks()[0];
+      if (track) {
+        try {
+          track.applyConstraints({
+            noiseSuppression: key === 'noiseSuppression' ? value : enhancementsRef.current.noiseSuppression,
+            echoCancellation: key === 'echoCancellation' ? value : enhancementsRef.current.echoCancellation,
+            autoGainControl: key === 'autoGainControl' ? value : enhancementsRef.current.autoGainControl,
+          });
+        } catch {}
+      }
+    }
   };
 
   const createAudioElement = () => {
@@ -164,12 +255,13 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     safeSet(setIsStreaming, false);
     safeSet(setIsReceiving, false);
     safeSet(setMicError, null);
+    safeSet(setInputLevel, 0);
   };
 
   const helpersRef = useRef({ createAudioElement, cleanupPeer, cleanupAll });
   helpersRef.current = { createAudioElement, cleanupPeer, cleanupAll };
 
-  // Main signaling channel — stable, only depends on sessionId + deviceId
+  // Main signaling channel
   useEffect(() => {
     if (!sessionId) return;
 
@@ -225,7 +317,6 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     const handleOffer = async (speakerId: string, offer: RTCSessionDescriptionInit) => {
       if (!channelRef.current) return;
 
-      // Clean up any existing connection to this speaker
       helpersRef.current.cleanupPeer(speakerId);
 
       const pc = new RTCPeerConnection(ICE_SERVERS);
@@ -235,7 +326,6 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         const audio = helpersRef.current.createAudioElement();
         audio.srcObject = e.streams[0];
         remoteStreamRef.current = e.streams[0];
-        // Connect through EQ pipeline if not already connected
         if (!sourceNodeRef.current) {
           connectAudioPipeline(audio);
         }
@@ -284,16 +374,13 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
 
       switch (payload.type) {
         case 'listener-join':
-          // Speaker: a new listener wants audio
           if (isSpeakingRef.current && localStreamRef.current) {
             createOfferForListener(payload.from);
           }
           break;
 
         case 'speaker-ready':
-          // Listener: speaker has mic ready, announce ourselves to get audio
           if (!isSpeakingRef.current) {
-            // Clean up old connections first
             helpersRef.current.cleanupPeer(payload.from);
             channelRef.current?.send({
               type: 'broadcast',
@@ -344,10 +431,20 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, deviceId]);
 
-  // When user becomes/stops being speaker — capture mic and broadcast readiness
+  // When user becomes/stops being speaker — capture mic with enhancements
   useEffect(() => {
     if (isSpeaking) {
-      navigator.mediaDevices.getUserMedia({ audio: true })
+      const settings = enhancementsRef.current;
+      navigator.mediaDevices.getUserMedia({
+        audio: {
+          noiseSuppression: settings.noiseSuppression,
+          echoCancellation: settings.echoCancellation,
+          autoGainControl: settings.autoGainControl,
+          // Optimize for speech
+          channelCount: 1,
+          sampleRate: 48000,
+        },
+      })
         .then((stream) => {
           if (!mountedRef.current) {
             stream.getTracks().forEach(t => t.stop());
@@ -357,7 +454,6 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
           setIsStreaming(true);
           setMicError(null);
 
-          // Announce to all listeners that speaker is ready with mic
           setTimeout(() => {
             channelRef.current?.send({
               type: 'broadcast',
@@ -384,7 +480,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSpeaking, deviceId]);
 
-  // Initial listener announcement on mount (for listeners already present when speaker starts)
+  // Initial listener announcement
   useEffect(() => {
     if (!sessionId || isSpeaking) return;
 
@@ -399,5 +495,17 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
 
-  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef, remoteStreamRef, setEQ };
+  return {
+    isStreaming,
+    isReceiving,
+    micError,
+    cleanupAll,
+    remoteAudioRef,
+    remoteStreamRef,
+    setEQ,
+    setVolume,
+    enhancements,
+    updateEnhancement,
+    inputLevel,
+  };
 }
