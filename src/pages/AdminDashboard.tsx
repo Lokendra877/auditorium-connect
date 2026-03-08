@@ -149,6 +149,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
+            <AudioEqualizer onEQChange={setEQ} />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
