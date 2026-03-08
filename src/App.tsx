@@ -11,7 +11,7 @@ import SaaSPricing from "./pages/saas/SaaSPricing";
 import SaaSUseCases from "./pages/saas/SaaSUseCases";
 import SaaSArchitecture from "./pages/saas/SaaSArchitecture";
 import SaaSContact from "./pages/saas/SaaSContact";
-import SaaSLogin from "./pages/saas/SaaSLogin";
+// SaaSLogin removed — using AdminLogin as single login
 import SaaSAdminDemo from "./pages/saas/SaaSAdminDemo";
 
 // App pages
@@ -39,7 +39,7 @@ const App = () => (
           <Route path="/use-cases" element={<SaaSUseCases />} />
           <Route path="/architecture" element={<SaaSArchitecture />} />
           <Route path="/contact" element={<SaaSContact />} />
-          <Route path="/saas-login" element={<SaaSLogin />} />
+          
           <Route path="/admin-demo" element={<SaaSAdminDemo />} />
 
           {/* Existing App */}

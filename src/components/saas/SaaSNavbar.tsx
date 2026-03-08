@@ -45,10 +45,10 @@ export function SaaSNavbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Link to="/saas-login">
+          <Link to="/admin-login">
             <Button variant="ghost" size="sm" className="font-medium">Log In</Button>
           </Link>
-          <Link to="/saas-login?mode=signup">
+          <Link to="/admin-login">
             <Button size="sm" className="gradient-primary text-primary-foreground font-medium rounded-lg shadow-colored hover:opacity-90 transition-opacity">
               Start Free Trial
             </Button>
@@ -86,10 +86,10 @@ export function SaaSNavbar() {
                 </Link>
               ))}
               <div className="pt-3 flex flex-col gap-2">
-                <Link to="/saas-login" onClick={() => setOpen(false)}>
+                <Link to="/admin-login" onClick={() => setOpen(false)}>
                   <Button variant="outline" className="w-full font-medium">Log In</Button>
                 </Link>
-                <Link to="/saas-login?mode=signup" onClick={() => setOpen(false)}>
+                <Link to="/admin-login" onClick={() => setOpen(false)}>
                   <Button className="w-full gradient-primary text-primary-foreground font-medium shadow-colored">Start Free Trial</Button>
                 </Link>
               </div>
