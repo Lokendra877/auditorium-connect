@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ChevronDown, ChevronUp, Users, User } from 'lucide-react';
+import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText } from 'lucide-react';
+import { toast } from 'sonner';
+import { exportPollResultsCSV, exportPollResultsPDF } from '@/lib/exportPollData';
 
 interface Poll {
   id: string;
@@ -29,6 +31,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [pollVotes, setPollVotes] = useState<Record<string, VoteDetail[]>>({});
   const [expandedPoll, setExpandedPoll] = useState<string | null>(null);
+  const [closing, setClosing] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPolls();
@@ -58,7 +61,6 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     }));
     setPolls(parsed);
 
-    // Fetch votes for all polls
     const pollIds = parsed.map(p => p.id);
     if (pollIds.length === 0) return;
 
@@ -67,7 +69,6 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
       .select('poll_id, device_id, option_index')
       .in('poll_id', pollIds);
 
-    // Fetch speaker queue for name/email mapping
     const { data: queueData } = await supabase
       .from('speaker_queue')
       .select('device_id, user_name, user_email')
@@ -91,6 +92,32 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     setPollVotes(grouped);
   };
 
+  const closePoll = async (pollId: string) => {
+    setClosing(pollId);
+    const { error } = await supabase
+      .from('session_polls')
+      .update({ is_active: false })
+      .eq('id', pollId);
+    if (error) {
+      toast.error('Failed to close poll');
+    } else {
+      toast.success('Poll closed! No more votes accepted.');
+    }
+    setClosing(null);
+  };
+
+  const reopenPoll = async (pollId: string) => {
+    const { error } = await supabase
+      .from('session_polls')
+      .update({ is_active: true })
+      .eq('id', pollId);
+    if (error) {
+      toast.error('Failed to reopen poll');
+    } else {
+      toast.success('Poll reopened!');
+    }
+  };
+
   if (polls.length === 0) {
     return (
       <div className="text-center py-6 text-muted-foreground text-sm">
@@ -104,17 +131,14 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
       <AnimatePresence>
         {polls.map(poll => {
           const votes = pollVotes[poll.id] || [];
-          // For multi-select, count unique devices; for single, count votes
           const uniqueVoters = new Set(votes.map(v => v.device_id)).size;
           const totalVotes = votes.length;
           const isExpanded = expandedPoll === poll.id;
 
-          // Count votes per option
           const optionCounts: Record<number, number> = {};
           poll.options.forEach((_, idx) => { optionCounts[idx] = 0; });
           votes.forEach(v => { optionCounts[v.option_index] = (optionCounts[v.option_index] || 0) + 1; });
 
-          // Get voters grouped by option
           const votersByOption: Record<number, VoteDetail[]> = {};
           poll.options.forEach((_, idx) => { votersByOption[idx] = []; });
           votes.forEach(v => {
@@ -124,7 +148,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
 
           return (
             <motion.div key={poll.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="shadow-sm border overflow-hidden">
+              <Card className={`shadow-sm border overflow-hidden ${!poll.is_active ? 'opacity-80' : ''}`}>
                 <CardHeader className="pb-2 pt-4 px-4">
                   <div className="flex items-center justify-between">
                     <CardTitle className="font-heading text-base flex items-center gap-2">
@@ -137,7 +161,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
                         {poll.is_multi_select && <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded ml-1">Multi-select</span>}
                       </span>
                       {!poll.is_active && (
-                        <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Closed</span>
+                        <span className="text-[10px] bg-destructive/15 text-destructive px-1.5 py-0.5 rounded font-medium">Closed</span>
                       )}
                     </div>
                   </div>
@@ -169,12 +193,60 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
                     );
                   })}
 
+                  {/* Action buttons row */}
+                  <div className="flex flex-wrap gap-2 mt-3 pt-2 border-t border-border">
+                    {/* Close / Reopen */}
+                    {poll.is_active ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs gap-1 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={() => closePoll(poll.id)}
+                        disabled={closing === poll.id}
+                      >
+                        <XCircle className="w-3 h-3" />
+                        {closing === poll.id ? 'Closing...' : 'Close Poll'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs gap-1"
+                        onClick={() => reopenPoll(poll.id)}
+                      >
+                        Reopen Poll
+                      </Button>
+                    )}
+
+                    {/* Export CSV */}
+                    {totalVotes > 0 && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs gap-1"
+                          onClick={() => exportPollResultsCSV(poll, votes, votersByOption)}
+                        >
+                          <Download className="w-3 h-3" /> CSV
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs gap-1"
+                          onClick={() => exportPollResultsPDF(poll, votes, votersByOption, optionCounts)}
+                        >
+                          <FileText className="w-3 h-3" /> PDF
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
                   {/* Expand/collapse voter details */}
                   {totalVotes > 0 && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full mt-2 text-xs text-muted-foreground hover:text-foreground"
+                      className="w-full mt-1 text-xs text-muted-foreground hover:text-foreground"
                       onClick={() => setExpandedPoll(isExpanded ? null : poll.id)}
                     >
                       {isExpanded ? <ChevronUp className="w-3 h-3 mr-1" /> : <ChevronDown className="w-3 h-3 mr-1" />}
