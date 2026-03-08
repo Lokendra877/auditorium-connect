@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import SessionPage from "./pages/SessionPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
+import AdminHome from "./pages/AdminHome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
