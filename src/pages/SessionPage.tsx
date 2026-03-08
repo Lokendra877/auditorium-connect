@@ -194,11 +194,14 @@ export default function SessionPage() {
                   type="email"
                   placeholder="Your email"
                   value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
+                  onChange={(e) => { setUserEmail(e.target.value); setEmailError(''); }}
                   onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                  className="text-center text-lg pl-10"
+                  className={`text-center text-lg pl-10 ${emailError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
               </div>
+              {emailError && (
+                <p className="text-xs text-destructive text-center -mt-2">{emailError}</p>
+              )}
               {hasSavedIdentity && (
                 <button
                   type="button"
