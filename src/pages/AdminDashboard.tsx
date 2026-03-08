@@ -47,7 +47,7 @@ export default function AdminDashboard() {
   const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
-  const prevSpeakerRef = useRef<string | null>(null);
+  const [recordings, setRecordings] = useState<any[]>([]);
   const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
 
   // Auto-record when a speaker starts, auto-stop when they finish
