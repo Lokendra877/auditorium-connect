@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,26 @@ import { toast } from 'sonner';
 import { Mail, Phone, Building2, User, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
+const CONTACT_COOKIE_KEY = 'smartmic-contact-details';
+
+function getSavedContact(): { contact: string; email: string } | null {
+  try {
+    const raw = localStorage.getItem(CONTACT_COOKIE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
+function saveContact(contact: string, email: string) {
+  localStorage.setItem(CONTACT_COOKIE_KEY, JSON.stringify({ contact, email }));
+}
+
 export default function SaaSContact() {
+  const saved = getSavedContact();
   const [form, setForm] = useState({
     institution: '',
-    contact: '',
-    email: '',
+    contact: saved?.contact || '',
+    email: saved?.email || '',
     phone: '',
     auditoriums: '',
   });
@@ -48,8 +63,11 @@ export default function SaaSContact() {
         },
       });
 
+      // Remember name & email for next time
+      saveContact(form.contact, form.email);
+
       toast.success('Demo request submitted! We will contact you within 24 hours.');
-      setForm({ institution: '', contact: '', email: '', phone: '', auditoriums: '' });
+      setForm(p => ({ institution: '', contact: p.contact, email: p.email, phone: '', auditoriums: '' }));
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit. Please try again.');
     } finally {
