@@ -9,7 +9,7 @@ export function useQueueActions(sessionId: string | undefined) {
   const deviceId = getDeviceId();
   const lastRequestRef = useRef<number>(0);
 
-  const requestToSpeak = useCallback(async (userName: string) => {
+  const requestToSpeak = useCallback(async (userName: string, userEmail?: string) => {
     if (!sessionId) return;
 
     // Client-side rate limit
