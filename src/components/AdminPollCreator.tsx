@@ -95,12 +95,22 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
             )}
           </div>
         ))}
-        <div className="flex gap-2">
+        <div className="flex items-center justify-between">
           {options.length < 6 && (
             <Button variant="ghost" size="sm" onClick={addOption}>
               <Plus className="w-4 h-4 mr-1" /> Add Option
             </Button>
           )}
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="multi-select"
+              checked={isMultiSelect}
+              onCheckedChange={(checked) => setIsMultiSelect(checked === true)}
+            />
+            <Label htmlFor="multi-select" className="text-xs cursor-pointer flex items-center gap-1">
+              <CheckSquare className="w-3 h-3" /> Allow multiple selections
+            </Label>
+          </div>
         </div>
         <div className="flex gap-2 pt-1">
           <Button onClick={createPoll} disabled={creating} className="bg-primary text-primary-foreground">
