@@ -15,6 +15,12 @@ const BANDS: { key: EQBand; label: string; freq: string }[] = [
   { key: 'treble', label: 'Treble', freq: '3 kHz' },
 ];
 
+const PRESETS: Record<string, Record<EQBand, number>> = {
+  Auditorium: { bass: 3, mid: 0, treble: 2 },
+  Clarity: { bass: -2, mid: 3, treble: 2 },
+  Warm: { bass: 4, mid: 2, treble: 0 },
+};
+
 export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
   const [gains, setGains] = useState<Record<EQBand, number>>({ bass: 0, mid: 0, treble: 0 });
 
