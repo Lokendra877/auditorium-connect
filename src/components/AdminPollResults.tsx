@@ -54,6 +54,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     const parsed = pollsData.map(p => ({
       ...p,
       options: (p.options as unknown as string[]) || [],
+      is_multi_select: (p as any).is_multi_select ?? false,
     }));
     setPolls(parsed);
 
