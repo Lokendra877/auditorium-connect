@@ -56,7 +56,7 @@ export default function SaaSUseCases() {
       <section className="relative overflow-hidden py-24 px-4">
         <div className="absolute inset-0">
           <img src={conferenceHallImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
+          <div className="absolute inset-0 bg-black/55" />
         </div>
         <div className="container mx-auto max-w-5xl relative z-10">
           <motion.div
@@ -65,8 +65,8 @@ export default function SaaSUseCases() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Built for Every Venue</h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4 text-white [text-shadow:_0_2px_20px_rgb(0_0_0_/_40%)]">Built for Every Venue</h1>
+            <p className="text-white/80 text-lg max-w-xl mx-auto [text-shadow:_0_1px_8px_rgb(0_0_0_/_30%)]">
               SmartMic adapts to any environment where audience interaction matters.
             </p>
           </motion.div>
