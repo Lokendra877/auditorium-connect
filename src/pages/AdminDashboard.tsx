@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
-import { useWebRTC } from '@/hooks/useWebRTC';
+import { useWebRTC, type EQBand } from '@/hooks/useWebRTC';
 import { useSessionAnalytics } from '@/hooks/useSessionAnalytics';
 import { QRDisplay } from '@/components/QRDisplay';
 import { QueueList } from '@/components/QueueList';
@@ -11,6 +11,7 @@ import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
+import { AudioEqualizer } from '@/components/AudioEqualizer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -28,7 +29,7 @@ export default function AdminDashboard() {
   const [volume, setVolume] = useState(100);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving, remoteAudioRef } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
 
   const handleVolumeChange = (value: number[]) => {
@@ -148,6 +149,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
+            <AudioEqualizer onEQChange={setEQ} />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>

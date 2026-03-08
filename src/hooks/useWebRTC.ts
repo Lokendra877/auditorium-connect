@@ -16,12 +16,17 @@ type SignalMessage = {
   payload?: any;
 };
 
+export type EQBand = 'bass' | 'mid' | 'treble';
+
 export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const deviceId = getDeviceId();
   const localStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const filtersRef = useRef<Record<EQBand, BiquadFilterNode | null>>({ bass: null, mid: null, treble: null });
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
@@ -41,11 +46,65 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     if (mountedRef.current) setter(value);
   };
 
+  const initAudioContext = () => {
+    if (!audioContextRef.current) {
+      const ctx = new AudioContext();
+      audioContextRef.current = ctx;
+
+      const bass = ctx.createBiquadFilter();
+      bass.type = 'lowshelf';
+      bass.frequency.value = 200;
+      bass.gain.value = 0;
+
+      const mid = ctx.createBiquadFilter();
+      mid.type = 'peaking';
+      mid.frequency.value = 1000;
+      mid.Q.value = 1.0;
+      mid.gain.value = 0;
+
+      const treble = ctx.createBiquadFilter();
+      treble.type = 'highshelf';
+      treble.frequency.value = 3000;
+      treble.gain.value = 0;
+
+      filtersRef.current = { bass, mid, treble };
+    }
+    return audioContextRef.current;
+  };
+
+  const connectAudioPipeline = (audioEl: HTMLAudioElement) => {
+    const ctx = initAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    // Avoid creating duplicate source nodes
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.disconnect(); } catch {}
+    }
+
+    const source = ctx.createMediaElementSource(audioEl);
+    sourceNodeRef.current = source;
+    const { bass, mid, treble } = filtersRef.current;
+    if (bass && mid && treble) {
+      source.connect(bass);
+      bass.connect(mid);
+      mid.connect(treble);
+      treble.connect(ctx.destination);
+    } else {
+      source.connect(ctx.destination);
+    }
+  };
+
+  const setEQ = (band: EQBand, gainDb: number) => {
+    const filter = filtersRef.current[band];
+    if (filter) filter.gain.value = gainDb;
+  };
+
   const createAudioElement = () => {
     if (!remoteAudioRef.current) {
       const audio = document.createElement('audio');
       audio.autoplay = true;
       audio.volume = 1.0;
+      audio.crossOrigin = 'anonymous';
       audio.style.display = 'none';
       document.body.appendChild(audio);
       remoteAudioRef.current = audio;
@@ -68,6 +127,11 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
+    }
+
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.disconnect(); } catch {}
+      sourceNodeRef.current = null;
     }
 
     if (remoteAudioRef.current) {
@@ -149,6 +213,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       pc.ontrack = (e) => {
         const audio = helpersRef.current.createAudioElement();
         audio.srcObject = e.streams[0];
+        // Connect through EQ pipeline if not already connected
+        if (!sourceNodeRef.current) {
+          connectAudioPipeline(audio);
+        }
         audio.play().catch(() => {});
         safeSet(setIsReceiving, true);
       };
@@ -309,5 +377,5 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
 
-  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef };
+  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef, setEQ };
 }
