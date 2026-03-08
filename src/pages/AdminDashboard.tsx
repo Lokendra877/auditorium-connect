@@ -44,7 +44,7 @@ export default function AdminDashboard() {
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
   const [recordings, setRecordings] = useState<any[]>([]);
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
-            <AudioEqualizer onEQChange={setEQ} />
+            <AudioEqualizer onEQChange={setEQ} onVolumeChange={setAudioVolume} enhancements={enhancements} onEnhancementChange={updateEnhancement} inputLevel={inputLevel} />
             <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
             <LiveSubtitles originalText={subtitle} translatedText={translatedSubtitle} isTranslating={isTranslating} targetLanguage={targetLanguage} ttsEnabled={ttsEnabled} onToggleTts={() => setTtsEnabled(prev => !prev)} />
             <Card className="shadow-md border-2 border-primary/20">
