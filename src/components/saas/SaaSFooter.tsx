@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mic2 } from 'lucide-react';
+import smartmicLogo from '@/assets/smartmic-logo.png';
 
 export function SaaSFooter() {
   return (
