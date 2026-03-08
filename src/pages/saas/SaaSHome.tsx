@@ -76,11 +76,11 @@ export default function SaaSHome() {
         {/* Background image */}
         <div className="absolute inset-0">
           <img src={auditoriumImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
+          <div className="absolute inset-0 bg-black/55" />
         </div>
         {/* Colorful blob shapes */}
-        <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px] animate-float" />
-        <div className="absolute bottom-20 -right-20 w-80 h-80 bg-secondary/10 blob-shape-2 blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/20 blob-shape blur-[80px] animate-float" />
+        <div className="absolute bottom-20 -right-20 w-80 h-80 bg-secondary/20 blob-shape-2 blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <motion.div
@@ -103,19 +103,19 @@ export default function SaaSHome() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-8 border border-primary/20"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 text-white text-sm font-semibold mb-8 border border-white/20 backdrop-blur-sm"
             >
               <Zap className="w-4 h-4" />
               Enterprise-Grade Auditorium Solution
             </motion.div>
 
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8 drop-shadow-lg">
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8 text-white [text-shadow:_0_2px_20px_rgb(0_0_0_/_40%)]">
               Smart, Contactless{' '}
               <span className="text-gradient">Microphone System</span>{' '}
               for Auditoriums
             </h1>
 
-            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-sm">
+            <p className="text-lg md:text-xl text-white/85 max-w-2xl mx-auto mb-12 leading-relaxed [text-shadow:_0_1px_8px_rgb(0_0_0_/_30%)]">
               Turn smartphones into controlled microphones using QR-based access. 
               Eliminate mic passing, maintain hygiene, and bring order to every session.
             </p>
@@ -128,7 +128,7 @@ export default function SaaSHome() {
                 </Button>
               </Link>
               <Link to="/pricing">
-                <Button variant="outline" size="lg" className="text-base px-10 h-14 font-heading font-semibold rounded-xl border-2">
+                <Button variant="outline" size="lg" className="text-base px-10 h-14 font-heading font-semibold rounded-xl border-2 border-white/30 text-white hover:bg-white/10 hover:text-white">
                   View Pricing
                 </Button>
               </Link>
@@ -143,8 +143,8 @@ export default function SaaSHome() {
              className="mt-20 flex flex-wrap items-center justify-center gap-6"
            >
              {['No hardware needed', 'Works on any smartphone', 'Setup in under 2 minutes', 'Enterprise-ready security'].map((text, i) => (
-               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border shadow-sm">
-                 <CheckCircle2 className="w-4 h-4 text-success" />
+               <div key={i} className="flex items-center gap-2 text-sm text-white/90 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 shadow-sm">
+                 <CheckCircle2 className="w-4 h-4 text-green-400" />
                  <span>{text}</span>
                </div>
              ))}

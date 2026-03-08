@@ -153,7 +153,7 @@ export default function SaaSPricing() {
       <section className="relative overflow-hidden py-24 px-4">
         <div className="absolute inset-0">
           <img src={enterpriseAuditoriumImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
+          <div className="absolute inset-0 bg-black/55" />
         </div>
         <div className="container mx-auto max-w-5xl relative z-10">
           <motion.div
@@ -162,8 +162,8 @@ export default function SaaSPricing() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+            <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4 text-white [text-shadow:_0_2px_20px_rgb(0_0_0_/_40%)]">Simple, Transparent Pricing</h1>
+            <p className="text-white/80 text-lg max-w-xl mx-auto [text-shadow:_0_1px_8px_rgb(0_0_0_/_30%)]">
               Choose the plan that fits your institution. Upgrade anytime as you scale.
             </p>
           </motion.div>
