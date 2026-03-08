@@ -17,18 +17,18 @@ export function MicStatus({ isActive, speakerName }: MicStatusProps) {
             transition={{ duration: 1.5, repeat: Infinity }}
           />
         )}
-        <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full ${
-          isActive ? 'bg-success' : 'bg-muted'
+        <div className={`relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-2 ${
+          isActive ? 'bg-success/20 border-success shadow-[0_0_16px_hsl(150_80%_45%/0.4)]' : 'bg-muted/20 border-border'
         }`}>
           {isActive ? (
-            <Mic className="w-5 h-5 text-success-foreground" />
+            <Mic className="w-5 h-5 text-success" />
           ) : (
             <MicOff className="w-5 h-5 text-muted-foreground" />
           )}
         </div>
       </div>
       <div>
-        <p className={`font-heading font-semibold text-sm ${isActive ? 'text-success' : 'text-muted-foreground'}`}>
+        <p className={`font-heading text-sm tracking-wider ${isActive ? 'text-success neon-text-cyan' : 'text-muted-foreground'}`}>
           {isActive ? 'Microphone Active' : 'Microphone Inactive'}
         </p>
         {speakerName && isActive && (

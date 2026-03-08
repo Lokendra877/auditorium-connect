@@ -130,17 +130,20 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-hero">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center retro-grid">
+        <div className="relative">
+          <div className="absolute inset-0 bg-anime-pink/20 rounded-full blur-2xl animate-glow-pulse" />
+          <Loader2 className="w-10 h-10 animate-spin text-anime-pink relative z-10" />
+        </div>
       </div>
     );
   }
 
   if (!session || session.admin_code !== adminCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center gradient-hero">
-        <Card className="max-w-md anime-card"><CardContent className="p-8 text-center">
-          <h2 className="font-heading text-2xl mb-2">Access Denied 🚫</h2>
+      <div className="min-h-screen flex items-center justify-center retro-grid">
+        <Card className="max-w-md anime-card neon-border"><CardContent className="p-8 text-center">
+          <h2 className="font-heading text-2xl tracking-wider mb-2 neon-text">Access Denied</h2>
           <p className="text-muted-foreground text-sm">Invalid admin code.</p>
         </CardContent></Card>
       </div>
@@ -149,28 +152,29 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Anime background accents */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-secondary/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
+      <div className="absolute inset-0 retro-grid opacity-30" />
+      {/* Neon background orbs */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-anime-pink/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-anime-cyan/5 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-anime-purple/3 rounded-full blur-[80px]" />
       </div>
 
-      <div className="container mx-auto px-4 py-6 relative">
+      <div className="container mx-auto px-4 py-6 relative z-10">
         {/* Header */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="font-heading text-3xl tracking-wide">{session.title}</h1>
-            <p className="text-sm text-muted-foreground">Admin Dashboard ⚡</p>
+            <h1 className="font-heading text-3xl tracking-wider neon-text">{session.title}</h1>
+            <p className="font-pixel text-[8px] text-anime-cyan tracking-widest uppercase mt-1">Admin Dashboard</p>
           </div>
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="border-2">
+                <Button variant="outline" size="sm" className="border-2 border-anime-cyan/40 text-anime-cyan hover:bg-anime-cyan/10">
                   <Download className="w-4 h-4 mr-1" /> Export
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-card border-2 border-border">
                 <DropdownMenuItem onClick={handleExportCSV}>
                   <FileSpreadsheet className="w-4 h-4 mr-2" /> Export as CSV
                 </DropdownMenuItem>
@@ -180,7 +184,7 @@ export default function AdminDashboard() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="destructive" size="sm" onClick={endSession} className="shadow-anime">
+            <Button variant="destructive" size="sm" onClick={endSession} className="shadow-[0_0_12px_hsl(0_85%_55%/0.3)]">
               <Power className="w-4 h-4 mr-1" /> End Session
             </Button>
           </div>
@@ -189,7 +193,7 @@ export default function AdminDashboard() {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Left: QR + Stats */}
           <div className="space-y-4">
-            <Card className="anime-card overflow-hidden">
+            <Card className="anime-card overflow-hidden neon-border">
               <CardContent className="p-4">
                 <QRDisplay sessionId={session.id} />
               </CardContent>
@@ -198,24 +202,24 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-3">
               <Card className="anime-card">
                 <CardContent className="p-4 text-center">
-                  <Users className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <p className="font-heading text-3xl">{queue.length}</p>
-                  <p className="text-xs text-muted-foreground">In Queue</p>
+                  <Users className="w-5 h-5 text-anime-pink mx-auto mb-1" />
+                  <p className="font-heading text-3xl neon-text">{queue.length}</p>
+                  <p className="font-pixel text-[7px] text-muted-foreground tracking-wider uppercase">In Queue</p>
                 </CardContent>
               </Card>
               <Card className="anime-card">
                 <CardContent className="p-4 text-center">
-                  <Clock className="w-5 h-5 text-accent mx-auto mb-1" />
-                  <p className="font-heading text-3xl">{session.speaking_time_seconds}s</p>
-                  <p className="text-xs text-muted-foreground">Per Speaker</p>
+                  <Clock className="w-5 h-5 text-anime-cyan mx-auto mb-1" />
+                  <p className="font-heading text-3xl neon-text-cyan">{session.speaking_time_seconds}s</p>
+                  <p className="font-pixel text-[7px] text-muted-foreground tracking-wider uppercase">Per Speaker</p>
                 </CardContent>
               </Card>
             </div>
 
             <Card className="anime-card">
               <CardContent className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Session ID</p>
-                <p className="font-mono text-[10px] break-all select-all">{session.id}</p>
+                <p className="font-pixel text-[7px] text-muted-foreground tracking-wider uppercase mb-1">Session ID</p>
+                <p className="font-mono text-[10px] break-all select-all text-anime-cyan/70">{session.id}</p>
               </CardContent>
             </Card>
           </div>
@@ -226,7 +230,7 @@ export default function AdminDashboard() {
             <Card className="anime-card">
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-4 h-4 text-primary" />
+                  <Volume2 className="w-4 h-4 text-anime-cyan" />
                   <Label htmlFor="volume" className="text-xs text-muted-foreground">Speaker Volume</Label>
                 </div>
                 <Slider id="volume" min={0} max={100} step={1} value={[volume]} onValueChange={handleVolumeChange} />
@@ -243,9 +247,9 @@ export default function AdminDashboard() {
               ttsEnabled={ttsEnabled}
               onToggleTts={() => setTtsEnabled(prev => !prev)}
             />
-            <Card className="anime-card border-2 border-primary/20">
+            <Card className="anime-card neon-border">
               <CardHeader>
-                <CardTitle className="font-heading text-xl tracking-wide">Current Speaker 🎤</CardTitle>
+                <CardTitle className="font-heading text-xl tracking-wider">Current Speaker 🎤</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <MicStatus isActive={!!currentSpeaker} speakerName={currentSpeaker?.user_name} />
@@ -253,17 +257,17 @@ export default function AdminDashboard() {
                   <>
                     <SpeakerTimer totalSeconds={session.speaking_time_seconds} startedAt={session.speaker_started_at} onTimeUp={handleTimeUp} />
                     <div className="flex gap-2">
-                      <Button variant="warning" size="sm" className="flex-1 shadow-anime" onClick={() => skipSpeaker(currentSpeaker.id).then(() => setTimeout(grantNextSpeaker, 500))}>
+                      <Button size="sm" className="flex-1 bg-anime-yellow text-accent-foreground hover:bg-anime-yellow/90 font-heading tracking-wide" onClick={() => skipSpeaker(currentSpeaker.id).then(() => setTimeout(grantNextSpeaker, 500))}>
                         Skip ⏭️
                       </Button>
-                      <Button variant="destructive" size="sm" className="flex-1 shadow-anime" onClick={() => revokeMic(currentSpeaker.id)}>
+                      <Button variant="destructive" size="sm" className="flex-1 font-heading tracking-wide" onClick={() => revokeMic(currentSpeaker.id)}>
                         Revoke 🔇
                       </Button>
                     </div>
                   </>
                 ) : (
-                  <Button className="w-full bg-success text-success-foreground hover:bg-success/90 shadow-anime font-heading tracking-wide" onClick={grantNextSpeaker} disabled={waitingCount === 0}>
-                    <PlayCircle className="w-4 h-4 mr-1" /> Grant Next ({waitingCount}) ▶️
+                  <Button className="w-full bg-success text-success-foreground hover:bg-success/90 font-heading tracking-wider shadow-[0_0_12px_hsl(150_80%_45%/0.3)]" onClick={grantNextSpeaker} disabled={waitingCount === 0}>
+                    <PlayCircle className="w-4 h-4 mr-1" /> Grant Next ({waitingCount})
                   </Button>
                 )}
               </CardContent>
@@ -273,12 +277,12 @@ export default function AdminDashboard() {
           {/* Right: Queue + Q&A + Polls */}
           <div className="space-y-4">
             <Tabs defaultValue="queue">
-              <TabsList className="w-full grid grid-cols-3 bg-muted/20 border-2 border-border">
-                <TabsTrigger value="queue" className="font-heading text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Queue</TabsTrigger>
-                <TabsTrigger value="questions" className="font-heading text-xs data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
+              <TabsList className="w-full grid grid-cols-3 bg-card border-2 border-border">
+                <TabsTrigger value="queue" className="font-heading text-xs tracking-wide data-[state=active]:bg-anime-pink data-[state=active]:text-primary-foreground">Queue</TabsTrigger>
+                <TabsTrigger value="questions" className="font-heading text-xs tracking-wide data-[state=active]:bg-anime-cyan data-[state=active]:text-secondary-foreground">
                   <MessageCircle className="w-3 h-3 mr-1" /> Q&A
                 </TabsTrigger>
-                <TabsTrigger value="polls" className="font-heading text-xs data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+                <TabsTrigger value="polls" className="font-heading text-xs tracking-wide data-[state=active]:bg-anime-yellow data-[state=active]:text-accent-foreground">
                   <BarChart3 className="w-3 h-3 mr-1" /> Polls
                 </TabsTrigger>
               </TabsList>
@@ -286,7 +290,7 @@ export default function AdminDashboard() {
               <TabsContent value="queue" className="mt-3">
                 <Card className="anime-card">
                   <CardHeader className="pb-2">
-                    <CardTitle className="font-heading text-lg tracking-wide">Speaker Queue 🔥</CardTitle>
+                    <CardTitle className="font-heading text-lg tracking-wider">Speaker Queue</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <QueueList queue={queue} isAdmin onSkip={(id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500))} onRemove={removeFromQueue} />
@@ -297,7 +301,7 @@ export default function AdminDashboard() {
               <TabsContent value="questions" className="mt-3">
                 <Card className="anime-card">
                   <CardHeader className="pb-2">
-                    <CardTitle className="font-heading text-lg tracking-wide">Audience Questions 💬</CardTitle>
+                    <CardTitle className="font-heading text-lg tracking-wider">Audience Questions</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <AdminQuestionsList sessionId={sessionId!} />
