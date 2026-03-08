@@ -3,6 +3,18 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// SaaS pages
+import SaaSHome from "./pages/saas/SaaSHome";
+import SaaSFeatures from "./pages/saas/SaaSFeatures";
+import SaaSPricing from "./pages/saas/SaaSPricing";
+import SaaSUseCases from "./pages/saas/SaaSUseCases";
+import SaaSArchitecture from "./pages/saas/SaaSArchitecture";
+import SaaSContact from "./pages/saas/SaaSContact";
+import SaaSLogin from "./pages/saas/SaaSLogin";
+import SaaSAdminDemo from "./pages/saas/SaaSAdminDemo";
+
+// App pages
 import LandingPage from "./pages/LandingPage";
 import SessionPage from "./pages/SessionPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -19,11 +31,23 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          {/* SaaS Website */}
+          <Route path="/" element={<SaaSHome />} />
+          <Route path="/features" element={<SaaSFeatures />} />
+          <Route path="/pricing" element={<SaaSPricing />} />
+          <Route path="/use-cases" element={<SaaSUseCases />} />
+          <Route path="/architecture" element={<SaaSArchitecture />} />
+          <Route path="/contact" element={<SaaSContact />} />
+          <Route path="/saas-login" element={<SaaSLogin />} />
+          <Route path="/admin-demo" element={<SaaSAdminDemo />} />
+
+          {/* Existing App */}
+          <Route path="/app" element={<LandingPage />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-home" element={<AdminHome />} />
           <Route path="/session/:sessionId" element={<SessionPage />} />
           <Route path="/admin/:sessionId" element={<AdminDashboard />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
