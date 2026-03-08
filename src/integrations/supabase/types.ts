@@ -237,6 +237,7 @@ export type Database = {
           created_at: string
           id: string
           is_active: boolean
+          is_multi_select: boolean
           options: Json
           question: string
           session_id: string
@@ -245,6 +246,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_multi_select?: boolean
           options?: Json
           question: string
           session_id: string
@@ -253,6 +255,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_active?: boolean
+          is_multi_select?: boolean
           options?: Json
           question?: string
           session_id?: string

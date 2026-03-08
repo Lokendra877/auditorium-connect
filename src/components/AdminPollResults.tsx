@@ -10,6 +10,7 @@ interface Poll {
   question: string;
   options: string[];
   is_active: boolean;
+  is_multi_select: boolean;
   created_at: string;
 }
 
@@ -53,6 +54,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     const parsed = pollsData.map(p => ({
       ...p,
       options: (p.options as unknown as string[]) || [],
+      is_multi_select: (p as any).is_multi_select ?? false,
     }));
     setPolls(parsed);
 
@@ -102,6 +104,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
       <AnimatePresence>
         {polls.map(poll => {
           const votes = pollVotes[poll.id] || [];
+          // For multi-select, count unique devices; for single, count votes
+          const uniqueVoters = new Set(votes.map(v => v.device_id)).size;
           const totalVotes = votes.length;
           const isExpanded = expandedPoll === poll.id;
 
@@ -129,7 +133,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Users className="w-3 h-3" /> {totalVotes}
+                        <Users className="w-3 h-3" /> {uniqueVoters} voter{uniqueVoters !== 1 ? 's' : ''}
+                        {poll.is_multi_select && <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded ml-1">Multi-select</span>}
                       </span>
                       {!poll.is_active && (
                         <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Closed</span>
