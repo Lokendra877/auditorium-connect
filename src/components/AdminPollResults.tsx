@@ -309,6 +309,16 @@ function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, clo
               </>
             )}
 
+            {/* Delete poll */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs gap-1 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => { if (confirm('Delete this poll and all its votes?')) deletePoll(poll.id); }}
+            >
+              <Trash2 className="w-3 h-3" /> Delete
+            </Button>
+
             {/* Export CSV */}
             {totalVotes > 0 && (
               <>
