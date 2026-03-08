@@ -63,8 +63,11 @@ export default function SaaSContact() {
         },
       });
 
+      // Remember name & email for next time
+      saveContact(form.contact, form.email);
+
       toast.success('Demo request submitted! We will contact you within 24 hours.');
-      setForm({ institution: '', contact: '', email: '', phone: '', auditoriums: '' });
+      setForm(p => ({ institution: '', contact: p.contact, email: p.email, phone: '', auditoriums: '' }));
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit. Please try again.');
     } finally {
