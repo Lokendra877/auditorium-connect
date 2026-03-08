@@ -31,7 +31,7 @@ export default function AdminDashboard() {
   const [volume, setVolume] = useState(100);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving, remoteAudioRef, setEQ } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
   const prevSpeakerRef = useRef<string | null>(null);
