@@ -507,5 +507,6 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     enhancements,
     updateEnhancement,
     inputLevel,
+    analyserRef,
   };
 }
