@@ -11,6 +11,7 @@ import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
+import { AudioEqualizer } from '@/components/AudioEqualizer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
