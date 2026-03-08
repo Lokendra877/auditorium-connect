@@ -70,6 +70,8 @@ export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
         </div>
         
         <div className="h-px bg-border" />
+        
+        {BANDS.map(({ key, label, freq }) => (
           <div key={key} className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-foreground">{label}</span>
