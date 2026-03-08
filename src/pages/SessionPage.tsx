@@ -23,6 +23,7 @@ export default function SessionPage() {
   const [userName, setUserName] = useState('');
   const [hasJoined, setHasJoined] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
   const amISpeaking = myEntry?.status === 'speaking' || false;
