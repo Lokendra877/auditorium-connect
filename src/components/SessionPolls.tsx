@@ -55,6 +55,7 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
         ...p,
         options: (p.options as unknown as string[]) || [],
         is_multi_select: (p as any).is_multi_select ?? false,
+        closes_at: (p as any).closes_at ?? null,
       }));
       setPolls(parsed);
       for (const p of parsed) {
