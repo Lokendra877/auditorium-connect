@@ -56,6 +56,12 @@ export function QueueList({ queue, currentDeviceId, isAdmin, onSkip, onRemove }:
                   {entry.user_name}
                   {isMe && <span className="ml-1 text-xs text-primary">(You)</span>}
                 </p>
+                {isAdmin && (entry as any).user_email && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                    <Mail className="w-3 h-3 shrink-0" />
+                    {(entry as any).user_email}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {isSpeaking ? <span className="text-success">Speaking now</span> : `Position #${index + 1}`}
