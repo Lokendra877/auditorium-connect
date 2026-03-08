@@ -189,6 +189,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
+            <AudioVisualizer analyserNode={analyserRef.current} isReceiving={isReceiving} />
             <AudioEqualizer onEQChange={setEQ} onVolumeChange={setAudioVolume} enhancements={enhancements} onEnhancementChange={updateEnhancement} inputLevel={inputLevel} />
             <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
             <LiveSubtitles originalText={subtitle} translatedText={translatedSubtitle} isTranslating={isTranslating} targetLanguage={targetLanguage} ttsEnabled={ttsEnabled} onToggleTts={() => setTtsEnabled(prev => !prev)} />
