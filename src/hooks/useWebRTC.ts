@@ -377,5 +377,5 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
 
-  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef };
+  return { isStreaming, isReceiving, micError, cleanupAll, remoteAudioRef, setEQ };
 }
