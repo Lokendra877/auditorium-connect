@@ -109,13 +109,13 @@ export default function SaaSHome() {
               Enterprise-Grade Auditorium Solution
             </motion.div>
 
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8">
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8 drop-shadow-lg">
               Smart, Contactless{' '}
               <span className="text-gradient">Microphone System</span>{' '}
               for Auditoriums
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-sm">
               Turn smartphones into controlled microphones using QR-based access. 
               Eliminate mic passing, maintain hygiene, and bring order to every session.
             </p>
