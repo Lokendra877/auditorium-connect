@@ -35,6 +35,8 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
     if (validOptions.length < 2) { toast.error('Need at least 2 options'); return; }
 
     setCreating(true);
+    const durationSec = parseInt(timerDuration);
+    const closesAt = durationSec > 0 ? new Date(Date.now() + durationSec * 1000).toISOString() : null;
     const { error } = await supabase
       .from('session_polls')
       .insert({
@@ -42,6 +44,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
         question: question.trim(),
         options: validOptions as unknown as any,
         is_multi_select: isMultiSelect,
+        closes_at: closesAt,
       } as any);
 
     if (error) {
