@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import auditoriumImage from '@/assets/auditorium.jpg';
 import {
   QrCode, Users, ShieldCheck, Mic2, BarChart3,
   ArrowRight, CheckCircle2, Timer, AlertTriangle, Handshake,
