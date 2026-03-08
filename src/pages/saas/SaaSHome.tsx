@@ -73,11 +73,15 @@ export default function SaaSHome() {
     <SaaSLayout>
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
-        <div className="absolute inset-0 gradient-hero" />
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img src={auditoriumImage} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 gradient-hero opacity-80" />
+        </div>
         {/* Colorful blob shapes */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px] animate-float" />
         <div className="absolute bottom-20 -right-20 w-80 h-80 bg-secondary/10 blob-shape-2 blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/5 blob-shape blur-[120px]" />
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <motion.div
@@ -140,28 +144,11 @@ export default function SaaSHome() {
              className="mt-20 flex flex-wrap items-center justify-center gap-6"
            >
              {['No hardware needed', 'Works on any smartphone', 'Setup in under 2 minutes', 'Enterprise-ready security'].map((text, i) => (
-               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card border border-border shadow-sm">
+               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border shadow-sm">
                  <CheckCircle2 className="w-4 h-4 text-success" />
                  <span>{text}</span>
                </div>
              ))}
-           </motion.div>
-
-           {/* Auditorium Image */}
-           <motion.div
-             initial={{ opacity: 0, y: 32 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.7, duration: 0.6 }}
-             className="mt-20 relative"
-           >
-             <div className="relative rounded-3xl overflow-hidden shadow-colored border-2 border-primary/20">
-               <img 
-                 src={auditoriumImage} 
-                 alt="Professional auditorium with audience" 
-                 className="w-full h-auto object-cover rounded-3xl"
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
-             </div>
            </motion.div>
          </div>
       </section>
