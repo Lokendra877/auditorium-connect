@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel, analyserRef } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef, remoteStreamRef, recordableStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel, analyserRef } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
   const [recordings, setRecordings] = useState<any[]>([]);
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
     const currentId = currentSpeaker?.id || null;
     const prevId = prevSpeakerRef.current;
     if (currentId && currentId !== prevId) {
-      setTimeout(() => { if (remoteStreamRef?.current) startRecording(remoteStreamRef.current, currentSpeaker!.user_name); }, 1000);
+      setTimeout(() => { if (recordableStreamRef?.current) startRecording(recordableStreamRef.current, currentSpeaker!.user_name); else if (remoteStreamRef?.current) startRecording(remoteStreamRef.current, currentSpeaker!.user_name); }, 1000);
     } else if (!currentId && prevId && isRecording) { stopRecording(); }
     prevSpeakerRef.current = currentId;
   }, [currentSpeaker?.id]);

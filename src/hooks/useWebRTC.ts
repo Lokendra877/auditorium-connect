@@ -62,6 +62,8 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const compressorRef = useRef<DynamicsCompressorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const recordableStreamRef = useRef<MediaStream | null>(null);
+  const streamDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
@@ -160,8 +162,23 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       compressor.connect(gainNode);
       gainNode.connect(analyser);
       analyser.connect(ctx.destination);
+
+      // Create a recordable stream from the processed audio
+      if (!streamDestRef.current) {
+        streamDestRef.current = ctx.createMediaStreamDestination();
+      }
+      try { analyser.disconnect(streamDestRef.current); } catch {}
+      analyser.connect(streamDestRef.current);
+      recordableStreamRef.current = streamDestRef.current.stream;
     } else {
       source.connect(ctx.destination);
+      // Fallback: create recordable stream from unprocessed source
+      if (!streamDestRef.current) {
+        streamDestRef.current = ctx.createMediaStreamDestination();
+      }
+      try { source.disconnect(streamDestRef.current); } catch {}
+      source.connect(streamDestRef.current);
+      recordableStreamRef.current = streamDestRef.current.stream;
     }
 
     // Start level metering
@@ -502,6 +519,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     cleanupAll,
     remoteAudioRef,
     remoteStreamRef,
+    recordableStreamRef,
     setEQ,
     setVolume,
     enhancements,
