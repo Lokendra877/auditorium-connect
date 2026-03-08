@@ -55,7 +55,21 @@ export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {BANDS.map(({ key, label, freq }) => (
+        <div className="flex gap-1.5 flex-wrap">
+          {Object.keys(PRESETS).map((presetName) => (
+            <Button
+              key={presetName}
+              variant="outline"
+              size="sm"
+              className="text-xs flex-1 min-w-20"
+              onClick={() => applyPreset(presetName)}
+            >
+              {presetName}
+            </Button>
+          ))}
+        </div>
+        
+        <div className="h-px bg-border" />
           <div key={key} className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-foreground">{label}</span>
