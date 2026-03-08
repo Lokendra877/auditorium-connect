@@ -67,10 +67,10 @@ export function RecordingsList({ sessionId }: { sessionId: string }) {
   };
 
   return (
-    <Card className="border-0 shadow-[var(--shadow-sm)]">
+    <Card className="anime-card">
       <CardHeader>
-        <CardTitle className="font-heading text-lg flex items-center gap-2">
-          <Mic className="w-4 h-4 text-primary" />
+        <CardTitle className="font-heading text-lg tracking-wider flex items-center gap-2">
+          <Mic className="w-4 h-4 text-anime-cyan" />
           Recordings ({recordings.length})
         </CardTitle>
       </CardHeader>
@@ -84,7 +84,7 @@ export function RecordingsList({ sessionId }: { sessionId: string }) {
             {recordings.map((rec) => (
               <div
                 key={rec.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/20 border border-border/30"
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">{rec.speaker_name}</p>
@@ -93,10 +93,10 @@ export function RecordingsList({ sessionId }: { sessionId: string }) {
                   </p>
                 </div>
                 <div className="flex gap-1 ml-2">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownload(rec)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-anime-cyan hover:text-anime-cyan hover:bg-anime-cyan/10" onClick={() => handleDownload(rec)}>
                     <Download className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(rec)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => handleDelete(rec)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>

@@ -51,6 +51,7 @@ export default {
   			'anime-pink': 'hsl(var(--anime-pink))',
   			'anime-yellow': 'hsl(var(--anime-yellow))',
   			'anime-purple': 'hsl(var(--anime-purple))',
+  			'anime-red': 'hsl(var(--anime-red))',
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
@@ -204,7 +205,10 @@ export default {
   			xl: 'var(--shadow-xl)',
   			'2xl': 'var(--shadow-2xl)',
   			anime: 'var(--shadow-anime)',
-  			glow: 'var(--shadow-glow)'
+  			'anime-cyan': 'var(--shadow-anime-cyan)',
+  			glow: 'var(--shadow-glow)',
+  			'glow-cyan': 'var(--shadow-glow-cyan)',
+  			'glow-yellow': 'var(--shadow-glow-yellow)'
   		}
   	}
   },
