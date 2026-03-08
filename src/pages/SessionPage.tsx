@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
@@ -18,14 +18,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle } from 'lucide-react';
+import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail } from 'lucide-react';
+
+function getCookie(name: string): string | null {
+  const nameEQ = name + '=';
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(nameEQ)) {
+      return decodeURIComponent(cookie.substring(nameEQ.length));
+    }
+  }
+  return null;
+}
+
+function setCookie(name: string, value: string, days: number = 365) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+}
 
 export default function SessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { session, queue, loading } = useSession(sessionId);
   const { requestToSpeak, revokeMic, deviceId } = useQueueActions(sessionId);
-  const [userName, setUserName] = useState('');
-  const [hasJoined, setHasJoined] = useState(false);
+
+  const savedName = getCookie('smartmic_user_name') || '';
+  const savedEmail = getCookie('smartmic_user_email') || '';
+
+  const [userName, setUserName] = useState(savedName);
+  const [userEmail, setUserEmail] = useState(savedEmail);
+  const [hasJoined, setHasJoined] = useState(!!savedName && !!savedEmail);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
 
