@@ -132,21 +132,38 @@ export default function SaaSHome() {
             </div>
           </motion.div>
 
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-20 flex flex-wrap items-center justify-center gap-6"
-          >
-            {['No hardware needed', 'Works on any smartphone', 'Setup in under 2 minutes', 'Enterprise-ready security'].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card border border-border shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-success" />
-                <span>{text}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
+           {/* Trust badges */}
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.5, duration: 0.6 }}
+             className="mt-20 flex flex-wrap items-center justify-center gap-6"
+           >
+             {['No hardware needed', 'Works on any smartphone', 'Setup in under 2 minutes', 'Enterprise-ready security'].map((text, i) => (
+               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card border border-border shadow-sm">
+                 <CheckCircle2 className="w-4 h-4 text-success" />
+                 <span>{text}</span>
+               </div>
+             ))}
+           </motion.div>
+
+           {/* Auditorium Image */}
+           <motion.div
+             initial={{ opacity: 0, y: 32 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.7, duration: 0.6 }}
+             className="mt-20 relative"
+           >
+             <div className="relative rounded-3xl overflow-hidden shadow-colored border-2 border-primary/20">
+               <img 
+                 src={auditoriumImage} 
+                 alt="Professional auditorium with audience" 
+                 className="w-full h-auto object-cover rounded-3xl"
+               />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
+             </div>
+           </motion.div>
+         </div>
       </section>
 
       {/* Testimonials */}
