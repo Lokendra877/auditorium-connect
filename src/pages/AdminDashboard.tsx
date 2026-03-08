@@ -33,6 +33,31 @@ export default function AdminDashboard() {
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
   const { isReceiving, remoteAudioRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
+  const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
+  const prevSpeakerRef = useRef<string | null>(null);
+
+  // Auto-record when a speaker starts, auto-stop when they finish
+  const currentSpeaker = queue.find(e => e.status === 'speaking');
+  const waitingCount = queue.filter(e => e.status === 'waiting').length;
+
+  useEffect(() => {
+    const currentId = currentSpeaker?.id || null;
+    const prevId = prevSpeakerRef.current;
+
+    if (currentId && currentId !== prevId) {
+      // New speaker started - begin recording after a short delay for stream to establish
+      setTimeout(() => {
+        if (remoteAudioRef?.current) {
+          startRecording(remoteAudioRef.current, currentSpeaker!.user_name);
+        }
+      }, 1000);
+    } else if (!currentId && prevId && isRecording) {
+      // Speaker finished - stop recording
+      stopRecording();
+    }
+
+    prevSpeakerRef.current = currentId;
+  }, [currentSpeaker?.id]);
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
