@@ -234,6 +234,7 @@ export type Database = {
       }
       session_polls: {
         Row: {
+          closes_at: string | null
           created_at: string
           id: string
           is_active: boolean
@@ -243,6 +244,7 @@ export type Database = {
           session_id: string
         }
         Insert: {
+          closes_at?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -252,6 +254,7 @@ export type Database = {
           session_id: string
         }
         Update: {
+          closes_at?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
