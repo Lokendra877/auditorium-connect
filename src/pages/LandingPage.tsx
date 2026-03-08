@@ -57,6 +57,12 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen gradient-hero">
       <div className="container mx-auto px-4 py-8">
+        {/* Top nav */}
+        <div className="flex justify-end mb-4">
+          <Button variant="outline" size="sm" onClick={() => navigate('/admin-login')}>
+            <Shield className="w-4 h-4 mr-1" /> Admin Login
+          </Button>
+        </div>
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

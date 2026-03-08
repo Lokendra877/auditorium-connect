@@ -49,6 +49,27 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           admin_code: string
@@ -60,6 +81,7 @@ export type Database = {
           speaking_time_seconds: number
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           admin_code?: string
@@ -71,6 +93,7 @@ export type Database = {
           speaking_time_seconds?: number
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           admin_code?: string
@@ -82,6 +105,7 @@ export type Database = {
           speaking_time_seconds?: number
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
