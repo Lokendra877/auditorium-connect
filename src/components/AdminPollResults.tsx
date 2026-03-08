@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText } from 'lucide-react';
+import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText, Timer } from 'lucide-react';
+import { usePollCountdown, formatCountdown } from '@/hooks/usePollCountdown';
 import { toast } from 'sonner';
 import { exportPollResultsCSV, exportPollResultsPDF } from '@/lib/exportPollData';
 
