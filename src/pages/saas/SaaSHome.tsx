@@ -136,11 +136,11 @@ export default function SaaSHome() {
              {testimonials.map((testimonial, i) => (
                <Card key={i} className="border-0 bg-white/50 backdrop-blur-sm shadow-[var(--shadow-md)]">
                  <CardContent className="p-6 space-y-4">
-                   <div className="flex gap-1">
-                     {[...Array(5)].map((_, i) => (
-                       <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                     ))}
-                   </div>
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
                    <p className="text-sm italic text-foreground">&quot;{testimonial.quote}&quot;</p>
                    <div className="pt-2 border-t border-border">
                      <p className="font-semibold text-sm">{testimonial.author}</p>
