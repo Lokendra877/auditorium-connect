@@ -12,6 +12,7 @@ import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { AudioEqualizer } from '@/components/AudioEqualizer';
+import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { AdminPollCreator } from '@/components/AdminPollCreator';
 import { AdminQuestionsList } from '@/components/AdminQuestionsList';
 import { AdminPollResults } from '@/components/AdminPollResults';
