@@ -42,6 +42,36 @@ const features = [
   { icon: Cloud, title: 'Cloud-Based & Scalable', desc: 'Works for 50 or 5,000 attendees.' },
 ];
 
+const testimonials = [
+  {
+    quote: "SmartMic transformed our Q&A sessions. No more mic passing delays, and our students actually engage now.",
+    author: "Dr. Sarah Chen",
+    role: "Dean of Academic Affairs",
+    institution: "Stanford University"
+  },
+  {
+    quote: "Perfect for our large auditorium events. The setup was literally 2 minutes, and our team is saving hours on session management.",
+    author: "Michael Rodriguez",
+    role: "Event Manager",
+    institution: "Google Campus"
+  },
+  {
+    quote: "Enterprise-ready and genuinely easy to use. Our conference attendance jumped 40% because people actually speak up now.",
+    author: "Jennifer Patel",
+    role: "VP of Operations",
+    institution: "TechCorp Annual Summit"
+  }
+];
+
+const institutions = [
+  "Stanford University",
+  "MIT",
+  "Google Campus",
+  "Microsoft",
+  "Harvard Law School",
+  "Yale School of Management"
+];
+
 export default function SaaSHome() {
   return (
     <SaaSLayout>
