@@ -133,7 +133,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Users className="w-3 h-3" /> {totalVotes}
+                        <Users className="w-3 h-3" /> {uniqueVoters} voter{uniqueVoters !== 1 ? 's' : ''}
+                        {poll.is_multi_select && <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded ml-1">Multi-select</span>}
                       </span>
                       {!poll.is_active && (
                         <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">Closed</span>
