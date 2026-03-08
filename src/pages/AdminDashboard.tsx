@@ -189,6 +189,7 @@ export default function AdminDashboard() {
               targetLanguage={targetLanguage}
               ttsEnabled={ttsEnabled}
               onToggleTts={() => setTtsEnabled(prev => !prev)}
+            />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
