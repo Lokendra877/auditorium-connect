@@ -54,6 +54,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
       setQuestion('');
       setOptions(['', '']);
       setIsMultiSelect(false);
+      setTimerDuration('0');
       setShowForm(false);
     }
     setCreating(false);
