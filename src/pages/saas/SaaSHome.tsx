@@ -138,7 +138,7 @@ export default function SaaSHome() {
                  <CardContent className="p-6 space-y-4">
                     <div className="flex gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="w-4 h-4 fill-warning text-warning" />
                       ))}
                     </div>
                    <p className="text-sm italic text-foreground">&quot;{testimonial.quote}&quot;</p>
