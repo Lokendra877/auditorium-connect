@@ -313,8 +313,4 @@ function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, clo
               </Card>
             </motion.div>
           );
-        })}
-      </AnimatePresence>
-    </div>
-  );
 }
