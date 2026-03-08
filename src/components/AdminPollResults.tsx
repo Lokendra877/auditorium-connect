@@ -10,6 +10,7 @@ interface Poll {
   question: string;
   options: string[];
   is_active: boolean;
+  is_multi_select: boolean;
   created_at: string;
 }
 
