@@ -100,7 +100,9 @@ export default function SessionPage() {
     : null;
 
   const handleJoin = () => {
-    if (!userName.trim()) return;
+    if (!userName.trim() || !userEmail.trim()) return;
+    setCookie('smartmic_user_name', userName.trim());
+    setCookie('smartmic_user_email', userEmail.trim());
     setHasJoined(true);
   };
 
