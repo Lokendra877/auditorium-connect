@@ -22,6 +22,9 @@ import { toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { RecordingsList } from '@/components/RecordingsList';
+import { LiveSubtitles } from '@/components/LiveSubtitles';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { useTranscriptListener } from '@/hooks/useTranslation';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
