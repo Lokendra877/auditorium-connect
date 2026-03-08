@@ -47,6 +47,10 @@ export default {
   				DEFAULT: 'hsl(var(--warning))',
   				foreground: 'hsl(var(--warning-foreground))'
   			},
+  			'anime-cyan': 'hsl(var(--anime-cyan))',
+  			'anime-pink': 'hsl(var(--anime-pink))',
+  			'anime-yellow': 'hsl(var(--anime-yellow))',
+  			'anime-purple': 'hsl(var(--anime-purple))',
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
@@ -72,91 +76,48 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		fontFamily: {
-  			heading: [
-  				'Space Grotesk',
-  				'sans-serif'
-  			],
-  			body: [
-  				'Inter',
-  				'sans-serif'
-  			],
-  			sans: [
-  				'Inter',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Roboto',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
-  				'sans-serif'
-  			],
-  			serif: [
-  				'Lora',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			],
-  			mono: [
-  				'Space Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
-  			]
+  			heading: ['Bangers', 'cursive'],
+  			body: ['Inter', 'sans-serif'],
+  			pixel: ['Press Start 2P', 'cursive'],
+  			sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			mono: ['Press Start 2P', 'ui-monospace', 'monospace']
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			},
   			'pulse-ring': {
-  				'0%': {
-  					transform: 'scale(0.8)',
-  					opacity: '1'
-  				},
-  				'100%': {
-  					transform: 'scale(2)',
-  					opacity: '0'
-  				}
+  				'0%': { transform: 'scale(0.8)', opacity: '1' },
+  				'100%': { transform: 'scale(2)', opacity: '0' }
   			},
   			'slide-up': {
-  				from: {
-  					transform: 'translateY(8px)',
-  					opacity: '0'
-  				},
-  				to: {
-  					transform: 'translateY(0)',
-  					opacity: '1'
-  				}
+  				from: { transform: 'translateY(8px)', opacity: '0' },
+  				to: { transform: 'translateY(0)', opacity: '1' }
+  			},
+  			'bounce-in': {
+  				'0%': { transform: 'scale(0.3)', opacity: '0' },
+  				'50%': { transform: 'scale(1.05)' },
+  				'70%': { transform: 'scale(0.9)' },
+  				'100%': { transform: 'scale(1)', opacity: '1' }
+  			},
+  			'shake': {
+  				'0%, 100%': { transform: 'translateX(0)' },
+  				'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+  				'20%, 40%, 60%, 80%': { transform: 'translateX(4px)' }
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
   			'pulse-ring': 'pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-  			'slide-up': 'slide-up 0.3s ease-out'
+  			'slide-up': 'slide-up 0.3s ease-out',
+  			'bounce-in': 'bounce-in 0.5s ease-out',
+  			'shake': 'shake 0.5s ease-in-out'
   		},
   		boxShadow: {
   			'2xs': 'var(--shadow-2xs)',
@@ -165,7 +126,9 @@ export default {
   			md: 'var(--shadow-md)',
   			lg: 'var(--shadow-lg)',
   			xl: 'var(--shadow-xl)',
-  			'2xl': 'var(--shadow-2xl)'
+  			'2xl': 'var(--shadow-2xl)',
+  			anime: 'var(--shadow-anime)',
+  			glow: 'var(--shadow-glow)'
   		}
   	}
   },
