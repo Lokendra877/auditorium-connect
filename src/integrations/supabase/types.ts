@@ -316,6 +316,7 @@ export type Database = {
           session_id: string
           started_speaking_at: string | null
           status: string
+          user_email: string | null
           user_name: string
         }
         Insert: {
@@ -327,6 +328,7 @@ export type Database = {
           session_id: string
           started_speaking_at?: string | null
           status?: string
+          user_email?: string | null
           user_name: string
         }
         Update: {
@@ -338,6 +340,7 @@ export type Database = {
           session_id?: string
           started_speaking_at?: string | null
           status?: string
+          user_email?: string | null
           user_name?: string
         }
         Relationships: [
