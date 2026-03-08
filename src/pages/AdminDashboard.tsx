@@ -16,8 +16,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Power, PlayCircle, Users, Clock, Volume2 } from 'lucide-react';
+import { Loader2, Power, PlayCircle, Users, Clock, Volume2, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
@@ -25,6 +32,7 @@ import { RecordingsList } from '@/components/RecordingsList';
 import { LiveSubtitles } from '@/components/LiveSubtitles';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranscriptListener } from '@/hooks/useTranslation';
+import { exportAllCSV, exportSessionPDF } from '@/lib/exportData';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
