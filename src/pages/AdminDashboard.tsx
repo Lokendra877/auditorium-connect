@@ -12,10 +12,14 @@ import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { AudioEqualizer } from '@/components/AudioEqualizer';
+import { AdminPollCreator } from '@/components/AdminPollCreator';
+import { AdminQuestionsList } from '@/components/AdminQuestionsList';
+import { SessionPolls } from '@/components/SessionPolls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Power, PlayCircle, Users, Clock, Volume2, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { Loader2, Power, PlayCircle, Users, Clock, Volume2, Download, FileText, FileSpreadsheet, MessageCircle, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
@@ -52,7 +56,6 @@ export default function AdminDashboard() {
 
   const prevSpeakerRef = useRef<string | null>(null);
 
-  // Fetch recordings for export
   useEffect(() => {
     if (!sessionId) return;
     const fetch = async () => {
@@ -83,7 +86,6 @@ export default function AdminDashboard() {
     toast.success('PDF report exported');
   };
 
-  // Auto-record when a speaker starts, auto-stop when they finish
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
 
@@ -92,14 +94,12 @@ export default function AdminDashboard() {
     const prevId = prevSpeakerRef.current;
 
     if (currentId && currentId !== prevId) {
-      // New speaker started - begin recording after a short delay for stream to establish
       setTimeout(() => {
         if (remoteStreamRef?.current) {
           startRecording(remoteStreamRef.current, currentSpeaker!.user_name);
         }
       }, 1000);
     } else if (!currentId && prevId && isRecording) {
-      // Speaker finished - stop recording
       stopRecording();
     }
 
@@ -114,11 +114,9 @@ export default function AdminDashboard() {
     }
   };
 
-
   const handleTimeUp = useCallback(async () => {
     if (currentSpeaker) {
       await revokeMic(currentSpeaker.id);
-      // Auto-grant next
       setTimeout(() => grantNextSpeaker(), 500);
     }
   }, [currentSpeaker, revokeMic, grantNextSpeaker]);
@@ -132,7 +130,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center gradient-hero">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -140,9 +138,9 @@ export default function AdminDashboard() {
 
   if (!session || session.admin_code !== adminCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md"><CardContent className="p-8 text-center">
-          <h2 className="font-heading text-xl font-bold mb-2">Access Denied</h2>
+      <div className="min-h-screen flex items-center justify-center gradient-hero">
+        <Card className="max-w-md anime-card"><CardContent className="p-8 text-center">
+          <h2 className="font-heading text-2xl mb-2">Access Denied 🚫</h2>
           <p className="text-muted-foreground text-sm">Invalid admin code.</p>
         </CardContent></Card>
       </div>
@@ -150,34 +148,39 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-background relative">
+      {/* Anime background accents */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-secondary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-4 py-6 relative">
         {/* Header */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="font-heading text-2xl font-bold">{session.title}</h1>
-            <p className="text-sm text-muted-foreground">Admin Dashboard</p>
+            <h1 className="font-heading text-3xl tracking-wide">{session.title}</h1>
+            <p className="text-sm text-muted-foreground">Admin Dashboard ⚡</p>
           </div>
           <div className="flex gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="border-2">
                   <Download className="w-4 h-4 mr-1" /> Export
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={handleExportCSV}>
-                  <FileSpreadsheet className="w-4 h-4 mr-2" />
-                  Export as CSV
+                  <FileSpreadsheet className="w-4 h-4 mr-2" /> Export as CSV
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleExportPDF}>
-                  <FileText className="w-4 h-4 mr-2" />
-                  Export as PDF
+                  <FileText className="w-4 h-4 mr-2" /> Export as PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="destructive" size="sm" onClick={endSession}>
+            <Button variant="destructive" size="sm" onClick={endSession} className="shadow-anime">
               <Power className="w-4 h-4 mr-1" /> End Session
             </Button>
           </div>
@@ -186,58 +189,47 @@ export default function AdminDashboard() {
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Left: QR + Stats */}
           <div className="space-y-4">
-            <QRDisplay sessionId={session.id} />
+            <Card className="anime-card overflow-hidden">
+              <CardContent className="p-4">
+                <QRDisplay sessionId={session.id} />
+              </CardContent>
+            </Card>
 
             <div className="grid grid-cols-2 gap-3">
-              <Card className="border-0 shadow-[var(--shadow-sm)]">
+              <Card className="anime-card">
                 <CardContent className="p-4 text-center">
                   <Users className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <p className="font-heading text-2xl font-bold">{queue.length}</p>
+                  <p className="font-heading text-3xl">{queue.length}</p>
                   <p className="text-xs text-muted-foreground">In Queue</p>
                 </CardContent>
               </Card>
-              <Card className="border-0 shadow-[var(--shadow-sm)]">
+              <Card className="anime-card">
                 <CardContent className="p-4 text-center">
                   <Clock className="w-5 h-5 text-accent mx-auto mb-1" />
-                  <p className="font-heading text-2xl font-bold">{session.speaking_time_seconds}s</p>
+                  <p className="font-heading text-3xl">{session.speaking_time_seconds}s</p>
                   <p className="text-xs text-muted-foreground">Per Speaker</p>
                 </CardContent>
               </Card>
             </div>
 
-            <Card className="border-0 shadow-[var(--shadow-sm)]">
+            <Card className="anime-card">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Session ID</p>
-                <p className="font-mono text-xs break-all select-all">{session.id}</p>
+                <p className="font-mono text-[10px] break-all select-all">{session.id}</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Center: Current Speaker */}
+          {/* Center: Current Speaker + Audio */}
           <div className="space-y-4">
-            <AudioStatus
-              isSpeaker={false}
-              isStreaming={false}
-              isReceiving={isReceiving}
-              micError={null}
-            />
-            <Card className="border-0 shadow-[var(--shadow-sm)]">
+            <AudioStatus isSpeaker={false} isStreaming={false} isReceiving={isReceiving} micError={null} />
+            <Card className="anime-card">
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <Volume2 className="w-4 h-4 text-primary" />
-                  <Label htmlFor="volume" className="text-xs text-muted-foreground">
-                    Speaker Volume
-                  </Label>
+                  <Label htmlFor="volume" className="text-xs text-muted-foreground">Speaker Volume</Label>
                 </div>
-                <Slider
-                  id="volume"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={[volume]}
-                  onValueChange={handleVolumeChange}
-                  className="w-full"
-                />
+                <Slider id="volume" min={0} max={100} step={1} value={[volume]} onValueChange={handleVolumeChange} />
                 <p className="text-xs text-muted-foreground text-right">{volume}%</p>
               </CardContent>
             </Card>
@@ -251,59 +243,73 @@ export default function AdminDashboard() {
               ttsEnabled={ttsEnabled}
               onToggleTts={() => setTtsEnabled(prev => !prev)}
             />
-            <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
+            <Card className="anime-card border-2 border-primary/20">
               <CardHeader>
-                <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
+                <CardTitle className="font-heading text-xl tracking-wide">Current Speaker 🎤</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <MicStatus isActive={!!currentSpeaker} speakerName={currentSpeaker?.user_name} />
-
                 {currentSpeaker && session.speaker_started_at ? (
                   <>
-                    <SpeakerTimer
-                      totalSeconds={session.speaking_time_seconds}
-                      startedAt={session.speaker_started_at}
-                      onTimeUp={handleTimeUp}
-                    />
+                    <SpeakerTimer totalSeconds={session.speaking_time_seconds} startedAt={session.speaker_started_at} onTimeUp={handleTimeUp} />
                     <div className="flex gap-2">
-                      <Button variant="warning" size="sm" className="flex-1" onClick={() => skipSpeaker(currentSpeaker.id).then(() => setTimeout(grantNextSpeaker, 500))}>
-                        Skip
+                      <Button variant="warning" size="sm" className="flex-1 shadow-anime" onClick={() => skipSpeaker(currentSpeaker.id).then(() => setTimeout(grantNextSpeaker, 500))}>
+                        Skip ⏭️
                       </Button>
-                      <Button variant="destructive" size="sm" className="flex-1" onClick={() => revokeMic(currentSpeaker.id)}>
-                        Revoke Mic
+                      <Button variant="destructive" size="sm" className="flex-1 shadow-anime" onClick={() => revokeMic(currentSpeaker.id)}>
+                        Revoke 🔇
                       </Button>
                     </div>
                   </>
                 ) : (
-                  <Button
-                    variant="success"
-                    className="w-full"
-                    onClick={grantNextSpeaker}
-                    disabled={waitingCount === 0}
-                  >
-                    <PlayCircle className="w-4 h-4 mr-1" />
-                    Grant Next Speaker ({waitingCount})
+                  <Button className="w-full bg-success text-success-foreground hover:bg-success/90 shadow-anime font-heading tracking-wide" onClick={grantNextSpeaker} disabled={waitingCount === 0}>
+                    <PlayCircle className="w-4 h-4 mr-1" /> Grant Next ({waitingCount}) ▶️
                   </Button>
                 )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Right: Queue */}
-          <div>
-            <Card className="border-0 shadow-[var(--shadow-sm)]">
-              <CardHeader>
-                <CardTitle className="font-heading text-lg">Speaker Queue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <QueueList
-                  queue={queue}
-                  isAdmin
-                  onSkip={(id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500))}
-                  onRemove={removeFromQueue}
-                />
-              </CardContent>
-            </Card>
+          {/* Right: Queue + Q&A + Polls */}
+          <div className="space-y-4">
+            <Tabs defaultValue="queue">
+              <TabsList className="w-full grid grid-cols-3 bg-muted/20 border-2 border-border">
+                <TabsTrigger value="queue" className="font-heading text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Queue</TabsTrigger>
+                <TabsTrigger value="questions" className="font-heading text-xs data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
+                  <MessageCircle className="w-3 h-3 mr-1" /> Q&A
+                </TabsTrigger>
+                <TabsTrigger value="polls" className="font-heading text-xs data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
+                  <BarChart3 className="w-3 h-3 mr-1" /> Polls
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="queue" className="mt-3">
+                <Card className="anime-card">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="font-heading text-lg tracking-wide">Speaker Queue 🔥</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <QueueList queue={queue} isAdmin onSkip={(id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500))} onRemove={removeFromQueue} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="questions" className="mt-3">
+                <Card className="anime-card">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="font-heading text-lg tracking-wide">Audience Questions 💬</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <AdminQuestionsList sessionId={sessionId!} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="polls" className="mt-3 space-y-3">
+                <AdminPollCreator sessionId={sessionId!} />
+                <SessionPolls sessionId={sessionId!} />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Analytics */}
