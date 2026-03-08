@@ -180,6 +180,13 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
             <AudioEqualizer onEQChange={setEQ} />
+            <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
+            <LiveSubtitles
+              originalText={subtitle}
+              translatedText={translatedSubtitle}
+              isTranslating={isTranslating}
+              targetLanguage={targetLanguage}
+            />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
