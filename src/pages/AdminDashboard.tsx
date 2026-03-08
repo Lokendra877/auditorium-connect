@@ -77,7 +77,7 @@ export default function AdminDashboard() {
     const currentId = currentSpeaker?.id || null;
     const prevId = prevSpeakerRef.current;
     if (currentId && currentId !== prevId) {
-      setTimeout(() => { if (remoteStreamRef?.current) startRecording(remoteStreamRef.current, currentSpeaker!.user_name); }, 1000);
+      setTimeout(() => { if (recordableStreamRef?.current) startRecording(recordableStreamRef.current, currentSpeaker!.user_name); else if (remoteStreamRef?.current) startRecording(remoteStreamRef.current, currentSpeaker!.user_name); }, 1000);
     } else if (!currentId && prevId && isRecording) { stopRecording(); }
     prevSpeakerRef.current = currentId;
   }, [currentSpeaker?.id]);
