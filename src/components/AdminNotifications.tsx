@@ -110,9 +110,25 @@ export function AdminNotifications() {
                   })
                 )}
               </div>
+              {notifications.length > 0 && (
+                <div className="px-4 py-2.5 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs text-primary hover:text-primary"
+                    onClick={() => { setOpen(false); navigate('/admin-notifications'); }}
+                  >
+                    View all notifications
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
+      )}
+    </div>
+  );
+}
       )}
     </div>
   );
