@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import conferenceHallImage from '@/assets/conference-hall.jpg';
 import { GraduationCap, Building2, Landmark, Presentation, Cpu } from 'lucide-react';
 
 const fadeUp = {
@@ -51,6 +52,27 @@ const cases = [
 export default function SaaSUseCases() {
   return (
     <SaaSLayout>
+      {/* Hero Image */}
+      <section className="py-12 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-colored border-2 border-secondary/20">
+              <img 
+                src={conferenceHallImage} 
+                alt="Professional conference hall with diverse audience" 
+                className="w-full h-auto object-cover rounded-3xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Use Cases Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-16">

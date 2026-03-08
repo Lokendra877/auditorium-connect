@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import enterpriseAuditoriumImage from '@/assets/enterprise-auditorium.jpg';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -148,6 +149,27 @@ export default function SaaSPricing() {
 
   return (
     <SaaSLayout>
+      {/* Hero Image */}
+      <section className="py-12 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-colored border-2 border-accent/20">
+              <img 
+                src={enterpriseAuditoriumImage} 
+                alt="Large enterprise auditorium with hundreds of attendees" 
+                className="w-full h-auto object-cover rounded-3xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-3xl" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-16">
