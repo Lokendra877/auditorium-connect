@@ -16,12 +16,17 @@ type SignalMessage = {
   payload?: any;
 };
 
+export type EQBand = 'bass' | 'mid' | 'treble';
+
 export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const deviceId = getDeviceId();
   const localStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const filtersRef = useRef<Record<EQBand, BiquadFilterNode | null>>({ bass: null, mid: null, treble: null });
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
