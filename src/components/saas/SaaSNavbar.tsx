@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Mic2 } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import smartmicLogo from '@/assets/smartmic-logo.png';
 
 const navLinks = [
   { label: 'Home', path: '/' },
