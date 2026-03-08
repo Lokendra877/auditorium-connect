@@ -201,7 +201,22 @@ export default function SessionPage() {
             <h1 className="font-heading text-2xl font-bold truncate">{session.title}</h1>
             <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
           </div>
-          <UserNotificationBell sessionId={sessionId!} />
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleClearAllCookies} className="text-destructive focus:text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Reset All Cookies
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <UserNotificationBell sessionId={sessionId!} />
+          </div>
         </motion.div>
 
         {/* Audio Status */}
