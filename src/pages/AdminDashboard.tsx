@@ -3,10 +3,12 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
+import { useWebRTC } from '@/hooks/useWebRTC';
 import { QRDisplay } from '@/components/QRDisplay';
 import { QueueList } from '@/components/QueueList';
 import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
+import { AudioStatus } from '@/components/AudioStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +22,7 @@ export default function AdminDashboard() {
   const adminCode = searchParams.get('code');
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
+  const { isReceiving } = useWebRTC(sessionId, false); // Admin is always a listener
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
@@ -104,6 +107,12 @@ export default function AdminDashboard() {
 
           {/* Center: Current Speaker */}
           <div className="space-y-4">
+            <AudioStatus
+              isSpeaker={false}
+              isStreaming={false}
+              isReceiving={isReceiving}
+              micError={null}
+            />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>

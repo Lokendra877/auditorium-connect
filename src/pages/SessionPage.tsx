@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
+import { useWebRTC } from '@/hooks/useWebRTC';
 import { QueueList } from '@/components/QueueList';
 import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
+import { AudioStatus } from '@/components/AudioStatus';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +56,8 @@ export default function SessionPage() {
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const myEntry = queue.find(e => e.device_id === deviceId);
+  const amISpeaking = myEntry?.status === 'speaking';
+  const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
   const waitingQueue = queue.filter(e => e.status === 'waiting');
   const myPosition = myEntry && myEntry.status === 'waiting'
     ? waitingQueue.findIndex(e => e.id === myEntry.id) + 1
@@ -104,8 +108,16 @@ export default function SessionPage() {
           <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
         </motion.div>
 
+        {/* Audio Status */}
+        <AudioStatus
+          isSpeaker={amISpeaking}
+          isStreaming={isStreaming}
+          isReceiving={isReceiving}
+          micError={micError}
+        />
+
         {/* Current Speaker */}
-        <Card className="mb-4 gradient-card border-0 shadow-[var(--shadow-md)]">
+        <Card className="mb-4 mt-3 gradient-card border-0 shadow-[var(--shadow-md)]">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <MicStatus
