@@ -22,7 +22,7 @@ export default function SessionPage() {
 
   // Compute speaking status before hooks (hooks must be called unconditionally)
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
-  const amISpeaking = myEntry?.status === 'speaking' ?? false;
+  const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
   if (loading) {
