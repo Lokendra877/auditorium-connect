@@ -3,7 +3,7 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
-import { useWebRTC } from '@/hooks/useWebRTC';
+import { useWebRTC, type EQBand } from '@/hooks/useWebRTC';
 import { useSessionAnalytics } from '@/hooks/useSessionAnalytics';
 import { QRDisplay } from '@/components/QRDisplay';
 import { QueueList } from '@/components/QueueList';
