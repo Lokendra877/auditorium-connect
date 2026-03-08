@@ -1,0 +1,121 @@
+import { useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { getDeviceId } from '@/lib/device-id';
+import { toast } from 'sonner';
+
+export function useQueueActions(sessionId: string | undefined) {
+  const deviceId = getDeviceId();
+
+  const requestToSpeak = useCallback(async (userName: string) => {
+    if (!sessionId) return;
+
+    // Check for duplicate
+    const { data: existing } = await supabase
+      .from('speaker_queue')
+      .select('id')
+      .eq('session_id', sessionId)
+      .eq('device_id', deviceId)
+      .in('status', ['waiting', 'speaking']);
+
+    if (existing && existing.length > 0) {
+      toast.error('You already have an active request');
+      return;
+    }
+
+    // Get next position
+    const { data: maxPos } = await supabase
+      .from('speaker_queue')
+      .select('position')
+      .eq('session_id', sessionId)
+      .order('position', { ascending: false })
+      .limit(1);
+
+    const nextPosition = (maxPos && maxPos.length > 0) ? maxPos[0].position + 1 : 1;
+
+    const { error } = await supabase
+      .from('speaker_queue')
+      .insert({
+        session_id: sessionId,
+        user_name: userName,
+        device_id: deviceId,
+        position: nextPosition,
+        status: 'waiting',
+      });
+
+    if (error) {
+      toast.error('Failed to join queue');
+    } else {
+      toast.success('Added to speaker queue!');
+    }
+  }, [sessionId, deviceId]);
+
+  const grantMic = useCallback(async (queueEntryId: string) => {
+    if (!sessionId) return;
+
+    // Set current speaker on session
+    await supabase
+      .from('speaker_queue')
+      .update({ status: 'speaking', started_speaking_at: new Date().toISOString() })
+      .eq('id', queueEntryId);
+
+    await supabase
+      .from('sessions')
+      .update({
+        current_speaker_id: queueEntryId,
+        speaker_started_at: new Date().toISOString(),
+      })
+      .eq('id', sessionId);
+  }, [sessionId]);
+
+  const revokeMic = useCallback(async (queueEntryId: string) => {
+    if (!sessionId) return;
+
+    await supabase
+      .from('speaker_queue')
+      .update({ status: 'done', finished_speaking_at: new Date().toISOString() })
+      .eq('id', queueEntryId);
+
+    await supabase
+      .from('sessions')
+      .update({ current_speaker_id: null, speaker_started_at: null })
+      .eq('id', sessionId);
+  }, [sessionId]);
+
+  const skipSpeaker = useCallback(async (queueEntryId: string) => {
+    if (!sessionId) return;
+
+    await supabase
+      .from('speaker_queue')
+      .update({ status: 'skipped', finished_speaking_at: new Date().toISOString() })
+      .eq('id', queueEntryId);
+
+    await supabase
+      .from('sessions')
+      .update({ current_speaker_id: null, speaker_started_at: null })
+      .eq('id', sessionId);
+  }, [sessionId]);
+
+  const removeFromQueue = useCallback(async (queueEntryId: string) => {
+    await supabase
+      .from('speaker_queue')
+      .delete()
+      .eq('id', queueEntryId);
+  }, []);
+
+  const grantNextSpeaker = useCallback(async () => {
+    if (!sessionId) return;
+    const { data: next } = await supabase
+      .from('speaker_queue')
+      .select('*')
+      .eq('session_id', sessionId)
+      .eq('status', 'waiting')
+      .order('position', { ascending: true })
+      .limit(1);
+
+    if (next && next.length > 0) {
+      await grantMic(next[0].id);
+    }
+  }, [sessionId, grantMic]);
+
+  return { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, deviceId };
+}
