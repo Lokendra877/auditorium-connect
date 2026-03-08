@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
 import { useWebRTC } from '@/hooks/useWebRTC';
+import { useSessionAnalytics } from '@/hooks/useSessionAnalytics';
 import { QRDisplay } from '@/components/QRDisplay';
 import { QueueList } from '@/components/QueueList';
 import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
+import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +24,8 @@ export default function AdminDashboard() {
   const adminCode = searchParams.get('code');
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving } = useWebRTC(sessionId, false); // Admin is always a listener
+  const { isReceiving } = useWebRTC(sessionId, false);
+  const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
@@ -75,7 +78,7 @@ export default function AdminDashboard() {
           </Button>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-4 gap-6">
           {/* Left: QR + Stats */}
           <div className="space-y-4">
             <QRDisplay sessionId={session.id} />
@@ -166,6 +169,11 @@ export default function AdminDashboard() {
                 />
               </CardContent>
             </Card>
+          </div>
+
+          {/* Analytics */}
+          <div>
+            <AnalyticsPanel analytics={analyticsData} />
           </div>
         </div>
       </div>
