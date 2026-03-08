@@ -4,13 +4,11 @@ import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  QrCode, Users, ShieldCheck, Mic2, BarChart3, Cloud,
+  QrCode, Users, ShieldCheck, Mic2, BarChart3,
   ArrowRight, CheckCircle2, Timer, AlertTriangle, Handshake,
   MessageSquare, Smartphone, ListOrdered, Volume2, Fingerprint,
-  Star, ThumbsUp, Vote, Zap
+  Star, ThumbsUp, Zap
 } from 'lucide-react';
-import animeMicHero from '@/assets/anime-mic-hero.png';
-import animeCrowd from '@/assets/anime-crowd.png';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -20,10 +18,10 @@ const fadeUp = {
 };
 
 const problems = [
-  { icon: Timer, title: 'Mic Passing Delays', desc: 'Physical mics waste minutes being passed around large audiences.' },
-  { icon: AlertTriangle, title: 'No Speaker Order', desc: 'Without a queue, Q&A sessions become chaotic and unfair.' },
-  { icon: ShieldCheck, title: 'Hygiene Concerns', desc: 'Shared microphones pose health risks in large gatherings.' },
-  { icon: MessageSquare, title: 'Poor Interaction', desc: 'Audiences disengage when speaking is difficult or disorganized.' },
+  { icon: Timer, title: 'Mic Passing Delays', desc: 'Physical mics waste minutes being passed around large audiences.', color: 'vibrant-orange' },
+  { icon: AlertTriangle, title: 'No Speaker Order', desc: 'Without a queue, Q&A sessions become chaotic and unfair.', color: 'vibrant-pink' },
+  { icon: ShieldCheck, title: 'Hygiene Concerns', desc: 'Shared microphones pose health risks in large gatherings.', color: 'vibrant-purple' },
+  { icon: MessageSquare, title: 'Poor Interaction', desc: 'Audiences disengage when speaking is difficult or disorganized.', color: 'vibrant-blue' },
 ];
 
 const steps = [
@@ -36,12 +34,12 @@ const steps = [
 ];
 
 const features = [
-  { icon: Fingerprint, title: 'Auto User ID', desc: 'Devices are remembered across sessions.', color: 'anime-pink' },
-  { icon: ListOrdered, title: 'Queue-Based Mic', desc: 'Orderly, fair speaker management.', color: 'anime-cyan' },
-  { icon: ShieldCheck, title: 'Contactless', desc: 'No physical mic needed.', color: 'anime-yellow' },
-  { icon: BarChart3, title: 'Admin Dashboard', desc: 'Full control over sessions.', color: 'anime-purple' },
-  { icon: ThumbsUp, title: 'Upvote Questions', desc: 'Submit & upvote top questions.', color: 'anime-pink' },
-  { icon: Mic2, title: 'Live Polls', desc: 'Real-time polls for instant feedback.', color: 'anime-cyan' },
+  { icon: Fingerprint, title: 'Auto User ID', desc: 'Devices are remembered across sessions.', color: 'primary' },
+  { icon: ListOrdered, title: 'Queue-Based Mic', desc: 'Orderly, fair speaker management.', color: 'secondary' },
+  { icon: ShieldCheck, title: 'Contactless', desc: 'No physical mic needed.', color: 'accent' },
+  { icon: BarChart3, title: 'Admin Dashboard', desc: 'Full control over sessions.', color: 'vibrant-orange' },
+  { icon: ThumbsUp, title: 'Upvote Questions', desc: 'Submit & upvote top questions.', color: 'vibrant-blue' },
+  { icon: Mic2, title: 'Live Polls', desc: 'Real-time polls for instant feedback.', color: 'vibrant-pink' },
 ];
 
 const testimonials = [
@@ -74,22 +72,11 @@ export default function SaaSHome() {
     <SaaSLayout>
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
-        {/* Retro grid + scanlines */}
-        <div className="absolute inset-0 retro-grid" />
-        <div className="absolute inset-0 scanlines" />
         <div className="absolute inset-0 gradient-hero" />
-        
-        {/* Floating neon orbs */}
-        <div className="absolute top-20 left-[10%] w-64 h-64 bg-anime-pink/10 rounded-full blur-[100px] animate-float" />
-        <div className="absolute bottom-20 right-[10%] w-80 h-80 bg-anime-cyan/10 rounded-full blur-[120px] animate-float" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-anime-purple/5 rounded-full blur-[150px]" />
-
-        {/* Anime sparkle decorations */}
-        <div className="absolute top-20 left-10 w-3 h-3 bg-anime-yellow rounded-full animate-sparkle" />
-        <div className="absolute top-40 right-20 w-4 h-4 bg-anime-cyan rounded-full animate-sparkle" style={{ animationDelay: '0.7s' }} />
-        <div className="absolute bottom-32 left-1/4 w-2 h-2 bg-anime-pink rounded-full animate-sparkle" style={{ animationDelay: '1.4s' }} />
-        <div className="absolute top-1/3 right-1/3 w-3 h-3 bg-anime-purple rounded-full animate-sparkle" style={{ animationDelay: '0.3s' }} />
-        <div className="absolute bottom-1/4 right-[15%] w-2 h-2 bg-anime-yellow rounded-full animate-sparkle" style={{ animationDelay: '2s' }} />
+        {/* Colorful blob shapes */}
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px] animate-float" />
+        <div className="absolute bottom-20 -right-20 w-80 h-80 bg-secondary/10 blob-shape-2 blur-[100px] animate-float" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/5 blob-shape blur-[120px]" />
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <motion.div
@@ -98,32 +85,30 @@ export default function SaaSHome() {
             transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto text-center"
           >
-            {/* Anime mic hero image */}
+            {/* Mic icon */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-              className="mx-auto w-36 h-36 md:w-48 md:h-48 mb-8 relative"
+              className="mx-auto w-20 h-20 mb-8 rounded-2xl gradient-primary flex items-center justify-center shadow-colored"
             >
-              <div className="absolute inset-0 bg-anime-pink/20 rounded-full blur-3xl animate-glow-pulse" />
-              <img src={animeMicHero} alt="SmartMic" className="w-full h-full object-contain animate-float drop-shadow-2xl relative z-10" />
+              <Mic2 className="w-10 h-10 text-primary-foreground" />
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-anime-pink/10 text-anime-pink text-sm font-bold mb-8 neon-border"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-8 border border-primary/20"
             >
               <Zap className="w-4 h-4" />
-              <span className="font-pixel text-[9px] tracking-wider uppercase">Enterprise Auditorium Solution</span>
-              <Zap className="w-4 h-4" />
+              Enterprise-Grade Auditorium Solution
             </motion.div>
 
-            <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl tracking-wider leading-none mb-8">
-              <span className="block text-foreground neon-text">Smart, Contactless</span>
-              <span className="block text-gradient mt-2">Microphone System</span>
-              <span className="block text-anime-cyan neon-text-cyan mt-2">for Auditoriums</span>
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8">
+              Smart, Contactless{' '}
+              <span className="text-gradient">Microphone System</span>{' '}
+              for Auditoriums
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -133,15 +118,13 @@ export default function SaaSHome() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/app">
-                <Button size="lg" className="bg-anime-pink text-primary-foreground hover:bg-anime-pink/90 text-base px-10 h-14 font-heading text-xl tracking-wider shadow-glow animate-glow-pulse relative overflow-hidden group">
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start Free Demo
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
+                <Button size="lg" className="gradient-primary text-primary-foreground text-base px-10 h-14 font-heading font-semibold rounded-xl shadow-colored hover:opacity-90 transition-opacity">
+                  Start Free Demo
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link to="/pricing">
-                <Button variant="outline" size="lg" className="text-base px-10 h-14 border-2 border-anime-cyan/50 text-anime-cyan hover:bg-anime-cyan/10 font-heading text-xl tracking-wider">
+                <Button variant="outline" size="lg" className="text-base px-10 h-14 font-heading font-semibold rounded-xl border-2">
                   View Pricing
                 </Button>
               </Link>
@@ -153,15 +136,10 @@ export default function SaaSHome() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-20 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
+            className="mt-20 flex flex-wrap items-center justify-center gap-6"
           >
-            {[
-              'No hardware needed',
-              'Works on any smartphone',
-              'Setup in under 2 minutes',
-              'Enterprise-ready security'
-            ].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card/50 border border-border/50">
+            {['No hardware needed', 'Works on any smartphone', 'Setup in under 2 minutes', 'Enterprise-ready security'].map((text, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 rounded-full bg-card border border-border shadow-sm">
                 <CheckCircle2 className="w-4 h-4 text-success" />
                 <span>{text}</span>
               </div>
@@ -171,29 +149,29 @@ export default function SaaSHome() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 relative dot-matrix">
+      <section className="py-20 relative">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
-            <span className="font-pixel text-[10px] text-anime-yellow tracking-widest uppercase neon-text-yellow">★ TESTIMONIALS ★</span>
-            <h2 className="font-heading text-4xl md:text-5xl tracking-wider mt-4 mb-4 text-foreground">
+            <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">Testimonials</p>
+            <h2 className="font-heading text-4xl md:text-5xl mb-4">
               Loved by <span className="text-gradient">Educators</span> Worldwide
             </h2>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {testimonials.map((testimonial, i) => (
               <motion.div key={i} {...fadeUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
-                <Card className="anime-card h-full group">
+                <Card className="card-hover h-full border shadow-sm">
                   <CardContent className="p-6 space-y-4">
                     <div className="flex gap-1">
                       {[...Array(5)].map((_, j) => (
-                        <Star key={j} className="w-4 h-4 fill-anime-yellow text-anime-yellow" />
+                        <Star key={j} className="w-4 h-4 fill-vibrant-yellow text-vibrant-yellow" />
                       ))}
                     </div>
-                    <p className="text-sm italic text-foreground/80">&quot;{testimonial.quote}&quot;</p>
-                    <div className="pt-3 border-t border-border/50">
-                      <p className="font-heading text-base tracking-wide text-foreground">{testimonial.author}</p>
+                    <p className="text-sm text-muted-foreground italic leading-relaxed">&quot;{testimonial.quote}&quot;</p>
+                    <div className="pt-3 border-t border-border">
+                      <p className="font-heading font-semibold text-sm">{testimonial.author}</p>
                       <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                      <p className="text-xs text-anime-cyan font-medium mt-1">{testimonial.institution}</p>
+                      <p className="text-xs text-primary font-medium mt-1">{testimonial.institution}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -203,12 +181,11 @@ export default function SaaSHome() {
 
           {/* Institution Trust */}
           <motion.div {...fadeUp} className="mt-16">
-            <p className="text-center font-pixel text-[8px] text-muted-foreground uppercase tracking-widest mb-6">Trusted by leading institutions</p>
+            <p className="text-center text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-6">Trusted by leading institutions</p>
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
               {institutions.map((inst, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-anime-cyan transition-colors">
-                  <div className="w-2 h-2 rounded-full bg-anime-pink" />
-                  <span className="font-medium">{inst}</span>
+                <div key={i} className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">
+                  {inst}
                 </div>
               ))}
             </div>
@@ -217,25 +194,24 @@ export default function SaaSHome() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-anime-red/3" />
-        <div className="container mx-auto px-4 relative z-10">
+      <section className="py-20 bg-muted/30 relative">
+        <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
-            <span className="font-pixel text-[10px] text-anime-red tracking-widest uppercase">⚠ THE PROBLEM ⚠</span>
-            <h2 className="font-heading text-4xl md:text-5xl tracking-wider mt-4 mb-4">
-              Traditional Mics Are <span className="text-destructive neon-text">Broken</span>
+            <p className="text-sm font-semibold text-destructive uppercase tracking-wider mb-3">The Problem</p>
+            <h2 className="font-heading text-4xl md:text-5xl mb-4">
+              Traditional Mics Are <span className="text-destructive">Broken</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">Every large venue faces these challenges during audience interaction.</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {problems.map((p, i) => (
               <motion.div key={p.title} {...fadeUp} transition={{ delay: i * 0.1, duration: 0.5 }}>
-                <Card className="bg-card border-2 border-destructive/30 hover:border-destructive/60 transition-colors h-full group" style={{ boxShadow: '4px 4px 0px hsl(0 85% 55% / 0.2)' }}>
+                <Card className={`card-hover h-full border-2 border-${p.color}/20 hover:border-${p.color}/40`}>
                   <CardContent className="p-6 text-center space-y-3">
-                    <div className="w-14 h-14 rounded-xl bg-destructive/15 flex items-center justify-center mx-auto border border-destructive/20 group-hover:shadow-[0_0_16px_hsl(0_85%_55%/0.3)] transition-shadow">
-                      <p.icon className="w-7 h-7 text-destructive" />
+                    <div className={`w-14 h-14 rounded-2xl bg-${p.color}/10 flex items-center justify-center mx-auto`}>
+                      <p.icon className={`w-7 h-7 text-${p.color}`} />
                     </div>
-                    <h3 className="font-heading text-xl tracking-wider">{p.title}</h3>
+                    <h3 className="font-heading font-bold text-lg">{p.title}</h3>
                     <p className="text-sm text-muted-foreground">{p.desc}</p>
                   </CardContent>
                 </Card>
@@ -247,35 +223,30 @@ export default function SaaSHome() {
 
       {/* How It Works */}
       <section className="py-20 relative">
-        <div className="absolute inset-0 retro-grid opacity-50" />
-        {/* Anime crowd decoration */}
-        <div className="absolute bottom-0 left-0 right-0 h-48 opacity-8 overflow-hidden">
-          <img src={animeCrowd} alt="" className="w-full h-full object-cover object-top" />
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
-            <span className="font-pixel text-[10px] text-anime-cyan tracking-widest uppercase neon-text-cyan">✦ HOW IT WORKS ✦</span>
-            <h2 className="font-heading text-4xl md:text-5xl tracking-wider mt-4 mb-4">
-              <span className="text-gradient-cyan">6 Simple Steps</span> to Digital Mic
+            <p className="text-sm font-semibold text-accent uppercase tracking-wider mb-3">How It Works</p>
+            <h2 className="font-heading text-4xl md:text-5xl mb-4">
+              <span className="text-gradient-accent">6 Simple Steps</span> to Digital Mic
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">A simple flow from QR scan to voice output.</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {steps.map((s, i) => (
               <motion.div key={s.title} {...fadeUp} transition={{ delay: i * 0.08, duration: 0.5 }}>
-                <Card className="anime-card h-full relative overflow-hidden group">
+                <Card className="card-hover h-full border shadow-sm relative overflow-hidden group">
                   <CardContent className="p-6 space-y-3 relative z-10">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-anime-cyan/10 flex items-center justify-center shrink-0 neon-border-cyan group-hover:shadow-glow-cyan transition-shadow">
-                        <s.icon className="w-6 h-6 text-anime-cyan" />
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                        <s.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <span className="font-pixel text-[8px] text-anime-pink/60 uppercase tracking-widest">Step {i + 1}</span>
+                      <span className="text-xs font-bold text-primary/50 uppercase tracking-widest">Step {i + 1}</span>
                     </div>
-                    <h3 className="font-heading text-xl tracking-wider">{s.title}</h3>
+                    <h3 className="font-heading font-bold text-lg">{s.title}</h3>
                     <p className="text-sm text-muted-foreground">{s.desc}</p>
                   </CardContent>
                   {/* Step number watermark */}
-                  <div className="absolute -bottom-4 -right-2 font-heading text-[80px] text-foreground/3 leading-none select-none">
+                  <div className="absolute -bottom-4 -right-2 font-heading text-[80px] font-extrabold text-muted/40 leading-none select-none">
                     {i + 1}
                   </div>
                 </Card>
@@ -286,11 +257,11 @@ export default function SaaSHome() {
       </section>
 
       {/* Features */}
-      <section className="py-20 relative dot-matrix">
+      <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
-            <span className="font-pixel text-[10px] text-anime-yellow tracking-widest uppercase neon-text-yellow">🔥 FEATURES 🔥</span>
-            <h2 className="font-heading text-4xl md:text-5xl tracking-wider mt-4 mb-4">
+            <p className="text-sm font-semibold text-secondary uppercase tracking-wider mb-3">Features</p>
+            <h2 className="font-heading text-4xl md:text-5xl mb-4">
               Powerful <span className="text-gradient">Features</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">Everything you need to run professional auditorium sessions.</p>
@@ -298,12 +269,12 @@ export default function SaaSHome() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {features.map((f, i) => (
               <motion.div key={f.title} {...fadeUp} transition={{ delay: i * 0.08, duration: 0.5 }}>
-                <Card className="anime-card h-full group">
+                <Card className="card-hover h-full border shadow-sm group">
                   <CardContent className="p-6 space-y-3">
-                    <div className={`w-12 h-12 rounded-xl bg-${f.color}/10 flex items-center justify-center border-2 border-${f.color}/30 group-hover:shadow-[0_0_16px_hsl(var(--${f.color})/0.3)] transition-shadow`}>
+                    <div className={`w-12 h-12 rounded-xl bg-${f.color}/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
                       <f.icon className={`w-6 h-6 text-${f.color}`} />
                     </div>
-                    <h3 className="font-heading text-xl tracking-wider">{f.title}</h3>
+                    <h3 className="font-heading font-bold text-lg">{f.title}</h3>
                     <p className="text-sm text-muted-foreground">{f.desc}</p>
                   </CardContent>
                 </Card>
@@ -312,7 +283,7 @@ export default function SaaSHome() {
           </div>
           <div className="text-center mt-12">
             <Link to="/features">
-              <Button variant="outline" size="lg" className="border-2 border-anime-pink/50 text-anime-pink hover:bg-anime-pink/10 font-heading text-xl tracking-wider">
+              <Button variant="outline" size="lg" className="font-heading font-semibold border-2 rounded-xl">
                 See All Features <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -321,19 +292,14 @@ export default function SaaSHome() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 relative">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp}>
-            <Card className="border-0 overflow-hidden relative">
+            <Card className="border-0 overflow-hidden relative rounded-3xl">
               <div className="absolute inset-0 gradient-primary" />
-              <div className="absolute inset-0 retro-grid opacity-30" />
-              <div className="absolute inset-0 scanlines" />
-              {/* Sparkle decorations */}
-              <div className="absolute top-8 left-12 w-3 h-3 bg-anime-yellow rounded-full animate-sparkle" />
-              <div className="absolute bottom-12 right-16 w-4 h-4 bg-anime-cyan rounded-full animate-sparkle" style={{ animationDelay: '0.8s' }} />
-              <div className="absolute top-1/2 right-1/4 w-2 h-2 bg-foreground rounded-full animate-sparkle" style={{ animationDelay: '1.5s' }} />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(0_0%_100%/0.15),transparent_60%)]" />
               <CardContent className="p-12 md:p-20 text-center relative z-10">
-                <h2 className="font-heading text-4xl md:text-6xl tracking-wider text-primary-foreground mb-6 neon-text">
+                <h2 className="font-heading text-4xl md:text-5xl text-primary-foreground mb-6">
                   Ready to Modernize Your Auditorium?
                 </h2>
                 <p className="text-primary-foreground/80 text-lg max-w-xl mx-auto mb-10">
@@ -341,12 +307,12 @@ export default function SaaSHome() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link to="/contact">
-                    <Button size="lg" className="bg-foreground text-background hover:bg-foreground/90 text-base px-10 h-14 font-heading text-xl tracking-wider shadow-anime">
+                    <Button size="lg" className="bg-white text-primary hover:bg-white/90 text-base px-10 h-14 font-heading font-semibold rounded-xl shadow-lg">
                       Request a Demo
                     </Button>
                   </Link>
                   <Link to="/pricing">
-                    <Button size="lg" variant="outline" className="border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 text-base px-10 h-14 font-heading text-xl tracking-wider">
+                    <Button size="lg" variant="outline" className="border-2 border-white/40 text-primary-foreground hover:bg-white/10 text-base px-10 h-14 font-heading font-semibold rounded-xl">
                       View Pricing
                     </Button>
                   </Link>

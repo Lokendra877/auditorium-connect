@@ -18,8 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Hand, Loader2, Mic, MessageCircle, BarChart3, StopCircle } from 'lucide-react';
-import animeMicHero from '@/assets/anime-mic-hero.png';
+import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle } from 'lucide-react';
 
 export default function SessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -39,21 +38,18 @@ export default function SessionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background retro-grid">
-        <div className="relative">
-          <div className="absolute inset-0 bg-anime-pink/20 rounded-full blur-2xl animate-glow-pulse" />
-          <Loader2 className="w-10 h-10 animate-spin text-anime-pink relative z-10" />
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background retro-grid">
-        <Card className="max-w-md anime-card neon-border">
+      <div className="min-h-screen flex items-center justify-center bg-background gradient-hero">
+        <Card className="max-w-md shadow-lg border">
           <CardContent className="p-8 text-center">
-            <h2 className="font-heading text-2xl tracking-wider mb-2 neon-text">Session Not Found</h2>
+            <h2 className="font-heading text-2xl font-bold mb-2">Session Not Found</h2>
             <p className="text-muted-foreground text-sm">This session may have ended or the link is invalid.</p>
           </CardContent>
         </Card>
@@ -63,10 +59,10 @@ export default function SessionPage() {
 
   if (!session.is_active) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background retro-grid">
-        <Card className="max-w-md anime-card neon-border-cyan">
+      <div className="min-h-screen flex items-center justify-center bg-background gradient-hero">
+        <Card className="max-w-md shadow-lg border">
           <CardContent className="p-8 text-center">
-            <h2 className="font-heading text-2xl tracking-wider mb-2 neon-text-cyan">Session Ended</h2>
+            <h2 className="font-heading text-2xl font-bold mb-2">Session Ended</h2>
             <p className="text-muted-foreground text-sm">This session is no longer active.</p>
           </CardContent>
         </Card>
@@ -97,26 +93,18 @@ export default function SessionPage() {
 
   if (!hasJoined) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute inset-0 retro-grid" />
-        <div className="absolute inset-0 gradient-hero" />
-        {/* Decorative anime elements */}
-        <div className="absolute top-10 right-10 w-32 h-32 opacity-20 animate-float">
-          <img src={animeMicHero} alt="" className="w-full h-full object-contain" />
-        </div>
-        <div className="absolute bottom-20 left-10 w-4 h-4 bg-anime-yellow rounded-full animate-sparkle" />
-        <div className="absolute top-1/3 left-1/4 w-3 h-3 bg-anime-cyan rounded-full animate-sparkle" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute bottom-1/3 right-1/4 w-2 h-2 bg-anime-pink rounded-full animate-sparkle" style={{ animationDelay: '1s' }} />
+      <div className="min-h-screen flex items-center justify-center gradient-hero px-4 relative overflow-hidden">
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px]" />
+        <div className="absolute bottom-20 -right-20 w-64 h-64 bg-secondary/10 blob-shape-2 blur-[80px]" />
         
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="relative z-10">
-          <Card className="w-full max-w-sm anime-card neon-border">
+          <Card className="w-full max-w-sm shadow-xl border">
             <CardHeader className="text-center">
-              <div className="mx-auto w-20 h-20 mb-3 relative">
-                <div className="absolute inset-0 bg-anime-pink/20 rounded-full blur-xl animate-glow-pulse" />
-                <img src={animeMicHero} alt="SmartMic" className="w-full h-full object-contain animate-float relative z-10" />
+              <div className="mx-auto w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-colored mb-3">
+                <Mic2 className="w-8 h-8 text-primary-foreground" />
               </div>
-              <CardTitle className="font-heading text-3xl tracking-wider neon-text">{session.title}</CardTitle>
-              <p className="font-pixel text-[8px] text-anime-cyan tracking-wider uppercase mt-2">Enter your name to join</p>
+              <CardTitle className="font-heading text-2xl">{session.title}</CardTitle>
+              <p className="text-sm text-muted-foreground">Enter your name to join</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <Input
@@ -125,10 +113,10 @@ export default function SessionPage() {
                 onChange={(e) => setUserName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
                 autoFocus
-                className="bg-muted/30 border-2 border-border focus:border-anime-pink text-center text-lg"
+                className="text-center text-lg"
               />
-              <Button className="w-full bg-anime-pink text-primary-foreground hover:bg-anime-pink/90 font-heading text-xl tracking-wider shadow-glow animate-glow-pulse h-12" onClick={handleJoin} disabled={!userName.trim()}>
-                Join Session 🎤
+              <Button className="w-full gradient-primary text-primary-foreground font-heading font-semibold text-lg shadow-colored hover:opacity-90 transition-opacity h-12" onClick={handleJoin} disabled={!userName.trim()}>
+                Join Session
               </Button>
             </CardContent>
           </Card>
@@ -139,30 +127,20 @@ export default function SessionPage() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      <div className="absolute inset-0 retro-grid opacity-50" />
-      {/* Neon background orbs */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-anime-pink/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-anime-cyan/5 rounded-full blur-[80px]" />
-      </div>
+      <div className="absolute inset-0 gradient-hero" />
 
       <div className="container mx-auto px-4 py-6 max-w-lg relative z-10">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="font-heading text-2xl tracking-wider neon-text truncate">{session.title}</h1>
-            <p className="font-pixel text-[7px] text-anime-cyan tracking-wider uppercase mt-1">Welcome, {userName}</p>
+            <h1 className="font-heading text-2xl font-bold truncate">{session.title}</h1>
+            <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
           </div>
           <UserNotificationBell sessionId={sessionId!} />
         </motion.div>
 
         {/* Audio Status */}
-        <AudioStatus
-          isSpeaker={amISpeaking}
-          isStreaming={isStreaming}
-          isReceiving={isReceiving}
-          micError={micError}
-        />
+        <AudioStatus isSpeaker={amISpeaking} isStreaming={isStreaming} isReceiving={isReceiving} micError={micError} />
 
         {/* Language Selector */}
         <div className="my-3">
@@ -172,30 +150,17 @@ export default function SessionPage() {
         {/* Live Subtitles */}
         {(subtitle || translatedSubtitle) && (
           <div className="mb-3">
-            <LiveSubtitles
-              originalText={subtitle}
-              translatedText={translatedSubtitle}
-              isTranslating={isTranslating}
-              targetLanguage={targetLanguage}
-              ttsEnabled={ttsEnabled}
-              onToggleTts={() => setTtsEnabled(prev => !prev)}
-            />
+            <LiveSubtitles originalText={subtitle} translatedText={translatedSubtitle} isTranslating={isTranslating} targetLanguage={targetLanguage} ttsEnabled={ttsEnabled} onToggleTts={() => setTtsEnabled(prev => !prev)} />
           </div>
         )}
 
         {/* Current Speaker */}
-        <Card className="mb-4 anime-card neon-border">
+        <Card className="mb-4 shadow-md border">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <MicStatus
-                isActive={!!currentSpeaker}
-                speakerName={currentSpeaker?.user_name}
-              />
+              <MicStatus isActive={!!currentSpeaker} speakerName={currentSpeaker?.user_name} />
               {currentSpeaker && session.speaker_started_at && (
-                <SpeakerTimer
-                  totalSeconds={session.speaking_time_seconds}
-                  startedAt={session.speaker_started_at}
-                />
+                <SpeakerTimer totalSeconds={session.speaking_time_seconds} startedAt={session.speaker_started_at} />
               )}
             </div>
           </CardContent>
@@ -204,24 +169,19 @@ export default function SessionPage() {
         {/* My Status */}
         {myEntry && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-4">
-            <Card className={`border-2 ${
-              myEntry.status === 'speaking' ? 'bg-success/10 neon-border-cyan' : 'bg-anime-pink/5 neon-border'
-            }`} style={{ boxShadow: myEntry.status === 'speaking' ? 'var(--shadow-glow-cyan)' : 'var(--shadow-glow)' }}>
+            <Card className={`shadow-md ${
+              myEntry.status === 'speaking' ? 'bg-success/5 border-2 border-success/30' : 'bg-primary/5 border-2 border-primary/20'
+            }`}>
               <CardContent className="p-4 text-center space-y-3">
                 {myEntry.status === 'speaking' ? (
                   <>
-                    <p className="font-heading text-2xl text-anime-cyan neon-text-cyan">🎙️ You are speaking!</p>
-                    <Button
-                      variant="destructive"
-                      size="lg"
-                      onClick={handleStopSpeaking}
-                      className="w-full font-heading text-lg tracking-wider"
-                    >
+                    <p className="font-heading text-xl font-bold text-success">🎙️ You are speaking!</p>
+                    <Button variant="destructive" size="lg" onClick={handleStopSpeaking} className="w-full font-heading font-semibold text-lg">
                       <StopCircle className="w-5 h-5 mr-2" /> Stop Speaking
                     </Button>
                   </>
                 ) : (
-                  <p className="font-heading text-xl text-anime-pink neon-text">
+                  <p className="font-heading text-lg font-bold text-primary">
                     Your position: <span className="text-3xl">#{myPosition}</span>
                   </p>
                 )}
@@ -234,30 +194,30 @@ export default function SessionPage() {
         {!myEntry && (
           <Button
             size="lg"
-            className="w-full mb-6 h-14 text-lg font-heading tracking-wider bg-anime-pink text-primary-foreground hover:bg-anime-pink/90 shadow-glow animate-glow-pulse"
+            className="w-full mb-6 h-14 text-lg font-heading font-semibold gradient-primary text-primary-foreground shadow-colored hover:opacity-90 transition-opacity"
             onClick={handleRequestSpeak}
           >
             <Hand className="w-5 h-5 mr-2" />
-            Request to Speak ✋
+            Request to Speak
           </Button>
         )}
 
         {/* Tabbed content */}
         <Tabs defaultValue="queue" className="mb-6">
-          <TabsList className="w-full grid grid-cols-3 bg-card border-2 border-border">
-            <TabsTrigger value="queue" className="font-heading text-sm gap-1.5 tracking-wide data-[state=active]:bg-anime-pink data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow">
+          <TabsList className="w-full grid grid-cols-3 bg-muted/50">
+            <TabsTrigger value="queue" className="font-medium text-sm gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Mic className="w-3.5 h-3.5" /> Queue
             </TabsTrigger>
-            <TabsTrigger value="questions" className="font-heading text-sm gap-1.5 tracking-wide data-[state=active]:bg-anime-cyan data-[state=active]:text-secondary-foreground data-[state=active]:shadow-glow-cyan">
+            <TabsTrigger value="questions" className="font-medium text-sm gap-1.5 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">
               <MessageCircle className="w-3.5 h-3.5" /> Q&A
             </TabsTrigger>
-            <TabsTrigger value="polls" className="font-heading text-sm gap-1.5 tracking-wide data-[state=active]:bg-anime-yellow data-[state=active]:text-accent-foreground data-[state=active]:shadow-glow-yellow">
+            <TabsTrigger value="polls" className="font-medium text-sm gap-1.5 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">
               <BarChart3 className="w-3.5 h-3.5" /> Polls
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="queue" className="mt-4">
-            <h2 className="font-pixel text-[8px] text-anime-pink tracking-widest uppercase mb-3">
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
               Speaker Queue ({queue.length})
             </h2>
             <QueueList queue={queue} currentDeviceId={deviceId} />
