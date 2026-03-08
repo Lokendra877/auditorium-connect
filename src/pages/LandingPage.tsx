@@ -65,11 +65,8 @@ export default function LandingPage() {
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Top nav */}
         <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center">
-              <Mic2 className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-heading text-xl font-bold">SmartMic</span>
+          <div className="flex items-center gap-1">
+            <img src={smartmicLogo} alt="SmartMic" className="h-9 w-auto" />
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate('/admin-login')} className="font-medium">
             <Shield className="w-4 h-4 mr-1" /> Admin Login
