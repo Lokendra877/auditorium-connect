@@ -13,19 +13,31 @@ import { AudioStatus } from '@/components/AudioStatus';
 import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Power, PlayCircle, Users, Clock } from 'lucide-react';
+import { Loader2, Power, PlayCircle, Users, Clock, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const adminCode = searchParams.get('code');
+  const [volume, setVolume] = useState(100);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
+
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (remoteAudioRef?.current) {
+      remoteAudioRef.current.volume = newVolume / 100;
+    }
+  };
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
@@ -116,6 +128,26 @@ export default function AdminDashboard() {
               isReceiving={isReceiving}
               micError={null}
             />
+            <Card className="border-0 shadow-[var(--shadow-sm)]">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-primary" />
+                  <Label htmlFor="volume" className="text-xs text-muted-foreground">
+                    Speaker Volume
+                  </Label>
+                </div>
+                <Slider
+                  id="volume"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={[volume]}
+                  onValueChange={handleVolumeChange}
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground text-right">{volume}%</p>
+              </CardContent>
+            </Card>
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
