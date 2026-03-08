@@ -107,6 +107,12 @@ export default function AdminDashboard() {
 
           {/* Center: Current Speaker */}
           <div className="space-y-4">
+            <AudioStatus
+              isSpeaker={false}
+              isStreaming={false}
+              isReceiving={isReceiving}
+              micError={null}
+            />
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
