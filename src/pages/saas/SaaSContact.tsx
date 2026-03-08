@@ -11,16 +11,36 @@ import { supabase } from '@/integrations/supabase/client';
 
 const CONTACT_COOKIE_KEY = 'smartmic-contact-details';
 
+function getCookie(name: string): string | null {
+  const nameEQ = name + '=';
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith(nameEQ)) {
+      return decodeURIComponent(cookie.substring(nameEQ.length));
+    }
+  }
+  return null;
+}
+
+function setCookie(name: string, value: string, days: number = 365) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+}
+
 function getSavedContact(): { contact: string; email: string } | null {
   try {
-    const raw = localStorage.getItem(CONTACT_COOKIE_KEY);
-    if (raw) return JSON.parse(raw);
+    const contact = getCookie('smartmic_contact_person');
+    const email = getCookie('smartmic_contact_email');
+    if (contact && email) return { contact, email };
   } catch {}
   return null;
 }
 
 function saveContact(contact: string, email: string) {
-  localStorage.setItem(CONTACT_COOKIE_KEY, JSON.stringify({ contact, email }));
+  setCookie('smartmic_contact_person', contact, 365);
+  setCookie('smartmic_contact_email', email, 365);
 }
 
 export default function SaaSContact() {
