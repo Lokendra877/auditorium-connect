@@ -39,7 +39,8 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
         session_id: sessionId,
         question: question.trim(),
         options: validOptions as unknown as any,
-      });
+        is_multi_select: isMultiSelect,
+      } as any);
 
     if (error) {
       toast.error('Failed to create poll');
