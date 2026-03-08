@@ -62,6 +62,8 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const compressorRef = useRef<DynamicsCompressorNode | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const recordableStreamRef = useRef<MediaStream | null>(null);
+  const streamDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const remoteStreamRef = useRef<MediaStream | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
