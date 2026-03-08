@@ -139,6 +139,17 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
     }
   };
 
+  const deletePoll = async (pollId: string) => {
+    // Delete votes first, then the poll
+    await supabase.from('poll_votes').delete().eq('poll_id', pollId);
+    const { error } = await supabase.from('session_polls').delete().eq('id', pollId);
+    if (error) {
+      toast.error('Failed to delete poll');
+    } else {
+      toast.success('Poll deleted');
+    }
+  };
+
   if (polls.length === 0) {
     return (
       <div className="text-center py-6 text-muted-foreground text-sm">
@@ -161,6 +172,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
             closePoll={closePoll}
             reopenPoll={reopenPoll}
             extendTimer={extendTimer}
+            deletePoll={deletePoll}
           />
         ))}
       </AnimatePresence>
