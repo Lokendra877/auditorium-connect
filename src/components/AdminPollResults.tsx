@@ -180,8 +180,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
   );
 }
 
-function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, closePoll, reopenPoll, extendTimer }: {
-  poll: Poll; pollVotes: Record<string, VoteDetail[]>; expandedPoll: string | null; setExpandedPoll: (id: string | null) => void; closing: string | null; closePoll: (id: string) => void; reopenPoll: (id: string) => void; extendTimer: (id: string, seconds: number) => void;
+function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, closePoll, reopenPoll, extendTimer, deletePoll }: {
+  poll: Poll; pollVotes: Record<string, VoteDetail[]>; expandedPoll: string | null; setExpandedPoll: (id: string | null) => void; closing: string | null; closePoll: (id: string) => void; reopenPoll: (id: string) => void; extendTimer: (id: string, seconds: number) => void; deletePoll: (id: string) => void;
 }) {
   const countdown = usePollCountdown(poll.id, poll.closes_at, poll.is_active);
   const progressPct = poll.closes_at ? calcProgressPercent(poll.closes_at, poll.created_at) : null;
