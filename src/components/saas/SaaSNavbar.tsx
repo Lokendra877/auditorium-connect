@@ -2,7 +2,16 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon, Settings } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/hooks/useTheme';
 import smartmicLogo from '@/assets/smartmic-logo.png';
 
 const navLinks = [
@@ -17,6 +26,7 @@ const navLinks = [
 export function SaaSNavbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   return (
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
@@ -43,6 +53,31 @@ export function SaaSNavbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
+          {/* Settings dropdown - Desktop */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">Appearance</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setTheme('light')}
+                className={theme === 'light' ? 'bg-primary/10 text-primary' : ''}
+              >
+                <Sun className="w-4 h-4 mr-2" /> Light Mode
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setTheme('dark')}
+                className={theme === 'dark' ? 'bg-primary/10 text-primary' : ''}
+              >
+                <Moon className="w-4 h-4 mr-2" /> Dark Mode
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Link to="/admin-login">
             <Button variant="ghost" size="sm" className="font-medium">Log In</Button>
           </Link>
@@ -53,10 +88,35 @@ export function SaaSNavbar() {
           </Link>
         </div>
 
-        {/* Mobile Toggle */}
-        <button className="lg:hidden p-2" onClick={() => setOpen(!open)}>
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* Mobile: Settings + Toggle */}
+        <div className="flex lg:hidden items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Settings className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">Appearance</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setTheme('light')}
+                className={theme === 'light' ? 'bg-primary/10 text-primary' : ''}
+              >
+                <Sun className="w-4 h-4 mr-2" /> Light Mode
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setTheme('dark')}
+                className={theme === 'dark' ? 'bg-primary/10 text-primary' : ''}
+              >
+                <Moon className="w-4 h-4 mr-2" /> Dark Mode
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <button className="p-2" onClick={() => setOpen(!open)}>
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
