@@ -78,7 +78,7 @@ export default function AdminDashboard() {
           </Button>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-4 gap-6">
           {/* Left: QR + Stats */}
           <div className="space-y-4">
             <QRDisplay sessionId={session.id} />
