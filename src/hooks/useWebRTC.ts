@@ -129,6 +129,11 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       localStreamRef.current = null;
     }
 
+    if (sourceNodeRef.current) {
+      try { sourceNodeRef.current.disconnect(); } catch {}
+      sourceNodeRef.current = null;
+    }
+
     if (remoteAudioRef.current) {
       remoteAudioRef.current.srcObject = null;
       remoteAudioRef.current.remove();
