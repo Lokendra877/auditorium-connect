@@ -204,7 +204,10 @@ export default {
   			xl: 'var(--shadow-xl)',
   			'2xl': 'var(--shadow-2xl)',
   			anime: 'var(--shadow-anime)',
-  			glow: 'var(--shadow-glow)'
+  			'anime-cyan': 'var(--shadow-anime-cyan)',
+  			glow: 'var(--shadow-glow)',
+  			'glow-cyan': 'var(--shadow-glow-cyan)',
+  			'glow-yellow': 'var(--shadow-glow-yellow)'
   		}
   	}
   },
