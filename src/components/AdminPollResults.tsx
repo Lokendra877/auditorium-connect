@@ -104,6 +104,8 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
       <AnimatePresence>
         {polls.map(poll => {
           const votes = pollVotes[poll.id] || [];
+          // For multi-select, count unique devices; for single, count votes
+          const uniqueVoters = new Set(votes.map(v => v.device_id)).size;
           const totalVotes = votes.length;
           const isExpanded = expandedPoll === poll.id;
 
