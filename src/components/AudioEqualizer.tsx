@@ -15,6 +15,12 @@ const BANDS: { key: EQBand; label: string; freq: string }[] = [
   { key: 'treble', label: 'Treble', freq: '3 kHz' },
 ];
 
+const PRESETS: Record<string, Record<EQBand, number>> = {
+  Auditorium: { bass: 3, mid: 0, treble: 2 },
+  Clarity: { bass: -2, mid: 3, treble: 2 },
+  Warm: { bass: 4, mid: 2, treble: 0 },
+};
+
 export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
   const [gains, setGains] = useState<Record<EQBand, number>>({ bass: 0, mid: 0, treble: 0 });
 
@@ -22,6 +28,12 @@ export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
     const db = value[0];
     setGains((prev) => ({ ...prev, [band]: db }));
     onEQChange(band, db);
+  };
+
+  const applyPreset = (presetName: string) => {
+    const preset = PRESETS[presetName];
+    setGains(preset);
+    BANDS.forEach((b) => onEQChange(b.key, preset[b.key]));
   };
 
   const resetAll = () => {
@@ -43,6 +55,22 @@ export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="flex gap-1.5 flex-wrap">
+          {Object.keys(PRESETS).map((presetName) => (
+            <Button
+              key={presetName}
+              variant="outline"
+              size="sm"
+              className="text-xs flex-1 min-w-20"
+              onClick={() => applyPreset(presetName)}
+            >
+              {presetName}
+            </Button>
+          ))}
+        </div>
+        
+        <div className="h-px bg-border" />
+        
         {BANDS.map(({ key, label, freq }) => (
           <div key={key} className="space-y-1.5">
             <div className="flex items-center justify-between">
