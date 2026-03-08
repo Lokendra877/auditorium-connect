@@ -4,10 +4,13 @@ import { motion } from 'framer-motion';
 import { useSession } from '@/hooks/useSession';
 import { useQueueActions } from '@/hooks/useQueueActions';
 import { useWebRTC } from '@/hooks/useWebRTC';
+import { useSpeechTranscription, useTranscriptListener } from '@/hooks/useTranslation';
 import { QueueList } from '@/components/QueueList';
 import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
+import { LanguageSelector } from '@/components/LanguageSelector';
+import { LiveSubtitles } from '@/components/LiveSubtitles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,11 +22,17 @@ export default function SessionPage() {
   const { requestToSpeak, deviceId } = useQueueActions(sessionId);
   const [userName, setUserName] = useState('');
   const [hasJoined, setHasJoined] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
 
-  // Compute speaking status before hooks (hooks must be called unconditionally)
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
   const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
+
+  // Speaker: transcribe speech and broadcast
+  useSpeechTranscription(sessionId, amISpeaking);
+
+  // Listener: receive transcripts and translate
+  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage);
 
   if (loading) {
     return (
@@ -118,8 +127,25 @@ export default function SessionPage() {
           micError={micError}
         />
 
+        {/* Language Selector */}
+        <div className="my-3">
+          <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
+        </div>
+
+        {/* Live Subtitles */}
+        {(subtitle || translatedSubtitle) && (
+          <div className="mb-3">
+            <LiveSubtitles
+              originalText={subtitle}
+              translatedText={translatedSubtitle}
+              isTranslating={isTranslating}
+              targetLanguage={targetLanguage}
+            />
+          </div>
+        )}
+
         {/* Current Speaker */}
-        <Card className="mb-4 mt-3 gradient-card border-0 shadow-[var(--shadow-md)]">
+        <Card className="mb-4 gradient-card border-0 shadow-[var(--shadow-md)]">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <MicStatus
