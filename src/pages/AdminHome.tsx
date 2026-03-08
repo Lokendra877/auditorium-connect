@@ -235,15 +235,46 @@ export default function AdminHome() {
                     </div>
 
                     {/* Actions */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => navigate(`/admin/${s.id}?code=${s.admin_code}`)}
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                      Open Dashboard
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => navigate(`/admin/${s.id}?code=${s.admin_code}`)}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                        Open Dashboard
+                      </Button>
+                      <AlertDialog open={deleteConfirm === s.id} onOpenChange={(open) => setDeleteConfirm(open ? s.id : null)}>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete session?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete "{s.title}" and all associated data. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteSession(s.id)}
+                              disabled={deleting}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {deleting ? 'Deleting...' : 'Delete'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
