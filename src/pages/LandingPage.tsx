@@ -66,7 +66,7 @@ export default function LandingPage() {
         {/* Top nav */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-1">
-            <img src={smartmicLogo} alt="SmartMic" className="h-24 w-auto" />
+            <img src={smartmicLogo} alt="SmartMic" className="h-28 w-auto" />
           </div>
           <Button variant="outline" size="sm" onClick={() => navigate('/admin-login')} className="font-medium">
             <Shield className="w-4 h-4 mr-1" /> Admin Login
