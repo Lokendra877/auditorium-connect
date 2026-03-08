@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      audio_recordings: {
+        Row: {
+          duration_seconds: number | null
+          file_path: string
+          id: string
+          recorded_at: string
+          session_id: string
+          speaker_name: string
+        }
+        Insert: {
+          duration_seconds?: number | null
+          file_path: string
+          id?: string
+          recorded_at?: string
+          session_id: string
+          speaker_name: string
+        }
+        Update: {
+          duration_seconds?: number | null
+          file_path?: string
+          id?: string
+          recorded_at?: string
+          session_id?: string
+          speaker_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_recordings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           admin_code: string
