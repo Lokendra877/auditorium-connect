@@ -10,7 +10,7 @@ const ICE_SERVERS: RTCConfiguration = {
 };
 
 type SignalMessage = {
-  type: 'listener-join' | 'offer' | 'answer' | 'ice-candidate' | 'speaker-left';
+  type: 'listener-join' | 'offer' | 'answer' | 'ice-candidate' | 'speaker-left' | 'speaker-ready';
   from: string;
   to?: string;
   payload?: any;
@@ -37,15 +37,15 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     return () => { mountedRef.current = false; };
   }, []);
 
-  const safeSetState = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T) => {
+  const safeSet = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T) => {
     if (mountedRef.current) setter(value);
   };
 
-  // All helper functions as plain functions using refs (no useCallback needed)
   const createAudioElement = () => {
     if (!remoteAudioRef.current) {
       const audio = document.createElement('audio');
       audio.autoplay = true;
+      audio.volume = 1.0;
       audio.style.display = 'none';
       document.body.appendChild(audio);
       remoteAudioRef.current = audio;
@@ -76,16 +76,15 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       remoteAudioRef.current = null;
     }
 
-    safeSetState(setIsStreaming, false);
-    safeSetState(setIsReceiving, false);
-    safeSetState(setMicError, null);
+    safeSet(setIsStreaming, false);
+    safeSet(setIsReceiving, false);
+    safeSet(setMicError, null);
   };
 
-  // Store helpers in refs so effects always have latest version without dependencies
   const helpersRef = useRef({ createAudioElement, cleanupPeer, cleanupAll });
   helpersRef.current = { createAudioElement, cleanupPeer, cleanupAll };
 
-  // Main signaling channel effect - only depends on sessionId + deviceId
+  // Main signaling channel — stable, only depends on sessionId + deviceId
   useEffect(() => {
     if (!sessionId) return;
 
@@ -128,24 +127,21 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       try {
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-
         channelRef.current?.send({
           type: 'broadcast',
           event: 'signal',
-          payload: {
-            type: 'offer',
-            from: deviceId,
-            to: listenerId,
-            payload: offer,
-          } as SignalMessage,
+          payload: { type: 'offer', from: deviceId, to: listenerId, payload: offer } as SignalMessage,
         });
       } catch (err) {
-        console.warn('Failed to create offer:', err);
+        console.warn('WebRTC: Failed to create offer:', err);
       }
     };
 
     const handleOffer = async (speakerId: string, offer: RTCSessionDescriptionInit) => {
       if (!channelRef.current) return;
+
+      // Clean up any existing connection to this speaker
+      helpersRef.current.cleanupPeer(speakerId);
 
       const pc = new RTCPeerConnection(ICE_SERVERS);
       peerConnectionsRef.current.set(speakerId, pc);
@@ -154,7 +150,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         const audio = helpersRef.current.createAudioElement();
         audio.srcObject = e.streams[0];
         audio.play().catch(() => {});
-        safeSetState(setIsReceiving, true);
+        safeSet(setIsReceiving, true);
       };
 
       pc.onicecandidate = (e) => {
@@ -175,7 +171,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
           helpersRef.current.cleanupPeer(speakerId);
-          safeSetState(setIsReceiving, false);
+          safeSet(setIsReceiving, false);
         }
       };
 
@@ -183,19 +179,13 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-
         channelRef.current?.send({
           type: 'broadcast',
           event: 'signal',
-          payload: {
-            type: 'answer',
-            from: deviceId,
-            to: speakerId,
-            payload: answer,
-          } as SignalMessage,
+          payload: { type: 'answer', from: deviceId, to: speakerId, payload: answer } as SignalMessage,
         });
       } catch (err) {
-        console.warn('Failed to handle offer:', err);
+        console.warn('WebRTC: Failed to handle offer:', err);
       }
     };
 
@@ -204,8 +194,22 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
 
       switch (payload.type) {
         case 'listener-join':
+          // Speaker: a new listener wants audio
           if (isSpeakingRef.current && localStreamRef.current) {
             createOfferForListener(payload.from);
+          }
+          break;
+
+        case 'speaker-ready':
+          // Listener: speaker has mic ready, announce ourselves to get audio
+          if (!isSpeakingRef.current) {
+            // Clean up old connections first
+            helpersRef.current.cleanupPeer(payload.from);
+            channelRef.current?.send({
+              type: 'broadcast',
+              event: 'signal',
+              payload: { type: 'listener-join', from: deviceId } as SignalMessage,
+            });
           }
           break;
 
@@ -233,7 +237,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
 
         case 'speaker-left':
           helpersRef.current.cleanupPeer(payload.from);
-          safeSetState(setIsReceiving, false);
+          safeSet(setIsReceiving, false);
+          if (remoteAudioRef.current) {
+            remoteAudioRef.current.srcObject = null;
+          }
           break;
       }
     });
@@ -247,7 +254,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, deviceId]);
 
-  // When user becomes/stops being speaker
+  // When user becomes/stops being speaker — capture mic and broadcast readiness
   useEffect(() => {
     if (isSpeaking) {
       navigator.mediaDevices.getUserMedia({ audio: true })
@@ -259,6 +266,15 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
           localStreamRef.current = stream;
           setIsStreaming(true);
           setMicError(null);
+
+          // Announce to all listeners that speaker is ready with mic
+          setTimeout(() => {
+            channelRef.current?.send({
+              type: 'broadcast',
+              event: 'signal',
+              payload: { type: 'speaker-ready', from: deviceId } as SignalMessage,
+            });
+          }, 500);
         })
         .catch((err: any) => {
           if (!mountedRef.current) return;
@@ -278,7 +294,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSpeaking, deviceId]);
 
-  // As a listener, announce presence to get audio
+  // Initial listener announcement on mount (for listeners already present when speaker starts)
   useEffect(() => {
     if (!sessionId || isSpeaking) return;
 
@@ -288,7 +304,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         event: 'signal',
         payload: { type: 'listener-join', from: deviceId } as SignalMessage,
       });
-    }, 1000);
+    }, 1500);
 
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
