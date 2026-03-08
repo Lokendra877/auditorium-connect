@@ -48,6 +48,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
       toast.success('Poll created! 🗳️');
       setQuestion('');
       setOptions(['', '']);
+      setIsMultiSelect(false);
       setShowForm(false);
     }
     setCreating(false);
