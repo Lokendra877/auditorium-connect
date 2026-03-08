@@ -108,8 +108,16 @@ export default function SessionPage() {
           <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
         </motion.div>
 
+        {/* Audio Status */}
+        <AudioStatus
+          isSpeaker={amISpeaking}
+          isStreaming={isStreaming}
+          isReceiving={isReceiving}
+          micError={micError}
+        />
+
         {/* Current Speaker */}
-        <Card className="mb-4 gradient-card border-0 shadow-[var(--shadow-md)]">
+        <Card className="mb-4 mt-3 gradient-card border-0 shadow-[var(--shadow-md)]">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <MicStatus
