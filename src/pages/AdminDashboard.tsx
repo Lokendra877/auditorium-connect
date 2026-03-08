@@ -19,7 +19,9 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Power, PlayCircle, Users, Clock, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { RecordingsList } from '@/components/RecordingsList';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
