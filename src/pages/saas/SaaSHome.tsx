@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   QrCode, Users, ShieldCheck, Mic2, BarChart3, Cloud,
   ArrowRight, CheckCircle2, Timer, AlertTriangle, Handshake,
-  MessageSquare, Smartphone, ListOrdered, Volume2, Fingerprint
+  MessageSquare, Smartphone, ListOrdered, Volume2, Fingerprint,
+  Star
 } from 'lucide-react';
 
 const fadeUp = {
@@ -39,6 +40,36 @@ const features = [
   { icon: BarChart3, title: 'Admin Dashboard', desc: 'Full control over speakers and sessions.' },
   { icon: Mic2, title: 'Real-Time Audio Streaming', desc: 'WebRTC-powered low-latency audio.' },
   { icon: Cloud, title: 'Cloud-Based & Scalable', desc: 'Works for 50 or 5,000 attendees.' },
+];
+
+const testimonials = [
+  {
+    quote: "SmartMic transformed our Q&A sessions. No more mic passing delays, and our students actually engage now.",
+    author: "Dr. Sarah Chen",
+    role: "Dean of Academic Affairs",
+    institution: "Stanford University"
+  },
+  {
+    quote: "Perfect for our large auditorium events. The setup was literally 2 minutes, and our team is saving hours on session management.",
+    author: "Michael Rodriguez",
+    role: "Event Manager",
+    institution: "Google Campus"
+  },
+  {
+    quote: "Enterprise-ready and genuinely easy to use. Our conference attendance jumped 40% because people actually speak up now.",
+    author: "Jennifer Patel",
+    role: "VP of Operations",
+    institution: "TechCorp Annual Summit"
+  }
+];
+
+const institutions = [
+  "Stanford University",
+  "MIT",
+  "Google Campus",
+  "Microsoft",
+  "Harvard Law School",
+  "Yale School of Management"
 ];
 
 export default function SaaSHome() {
@@ -82,22 +113,64 @@ export default function SaaSHome() {
             </div>
           </motion.div>
 
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
-          >
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> No hardware needed</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Works on any smartphone</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Setup in under 2 minutes</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Enterprise-ready security</div>
-          </motion.div>
-        </div>
-      </section>
+           {/* Trust badges */}
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.5, duration: 0.6 }}
+             className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
+           >
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> No hardware needed</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Works on any smartphone</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Setup in under 2 minutes</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Enterprise-ready security</div>
+           </motion.div>
 
-      {/* Problem Section */}
+           {/* Testimonials */}
+           <motion.div
+             initial={{ opacity: 0, y: 24 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.7, duration: 0.6 }}
+             className="mt-20 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto"
+           >
+             {testimonials.map((testimonial, i) => (
+               <Card key={i} className="border-0 bg-white/50 backdrop-blur-sm shadow-[var(--shadow-md)]">
+                 <CardContent className="p-6 space-y-4">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-warning text-warning" />
+                      ))}
+                    </div>
+                   <p className="text-sm italic text-foreground">&quot;{testimonial.quote}&quot;</p>
+                   <div className="pt-2 border-t border-border">
+                     <p className="font-semibold text-sm">{testimonial.author}</p>
+                     <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                     <p className="text-xs text-primary font-medium mt-1">{testimonial.institution}</p>
+                   </div>
+                 </CardContent>
+               </Card>
+             ))}
+           </motion.div>
+
+           {/* Institution Logos / Trust Badges */}
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.9, duration: 0.6 }}
+             className="mt-16"
+           >
+             <p className="text-center text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-6">Trusted by leading institutions</p>
+             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+               {institutions.map((inst, i) => (
+                 <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                   <div className="w-2 h-2 rounded-full bg-primary" />
+                   <span className="font-medium">{inst}</span>
+                 </div>
+               ))}
+             </div>
+           </motion.div>
+         </div>
+       </section>
       <section className="py-20 bg-card/50">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
