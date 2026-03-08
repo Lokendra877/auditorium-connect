@@ -33,7 +33,7 @@ export default function SessionPage() {
   useSpeechTranscription(sessionId, amISpeaking);
 
   // Listener: receive transcripts and translate
-  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage);
+  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
 
   if (loading) {
     return (
