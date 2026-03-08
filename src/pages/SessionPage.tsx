@@ -129,18 +129,28 @@ export default function SessionPage() {
                 <Mic2 className="w-8 h-8 text-primary-foreground" />
               </div>
               <CardTitle className="font-heading text-2xl">{session.title}</CardTitle>
-              <p className="text-sm text-muted-foreground">Enter your name to join</p>
+              <p className="text-sm text-muted-foreground">Enter your details to join</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <Input
                 placeholder="Your name"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
                 autoFocus
                 className="text-center text-lg"
               />
-              <Button className="w-full gradient-primary text-primary-foreground font-heading font-semibold text-lg shadow-colored hover:opacity-90 transition-opacity h-12" onClick={handleJoin} disabled={!userName.trim()}>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="email"
+                  placeholder="Your email"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                  className="text-center text-lg pl-10"
+                />
+              </div>
+              <Button className="w-full gradient-primary text-primary-foreground font-heading font-semibold text-lg shadow-colored hover:opacity-90 transition-opacity h-12" onClick={handleJoin} disabled={!userName.trim() || !userEmail.trim()}>
                 Join Session
               </Button>
             </CardContent>
