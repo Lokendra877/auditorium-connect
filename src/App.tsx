@@ -20,6 +20,7 @@ import SessionPage from "./pages/SessionPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminHome from "./pages/AdminHome";
+import AdminNotificationsPage from "./pages/AdminNotificationsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/app" element={<LandingPage />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-home" element={<AdminHome />} />
+          <Route path="/admin-notifications" element={<AdminNotificationsPage />} />
           <Route path="/session/:sessionId" element={<SessionPage />} />
           <Route path="/admin/:sessionId" element={<AdminDashboard />} />
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bell, X, CheckCircle2, UserPlus, MessageSquare, Mic2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ const typeIcons: Record<string, React.ElementType> = {
 };
 
 export function AdminNotifications() {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -108,6 +110,18 @@ export function AdminNotifications() {
                   })
                 )}
               </div>
+              {notifications.length > 0 && (
+                <div className="px-4 py-2.5 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs text-primary hover:text-primary"
+                    onClick={() => { setOpen(false); navigate('/admin-notifications'); }}
+                  >
+                    View all notifications
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
