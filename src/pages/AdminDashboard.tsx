@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const adminCode = searchParams.get('code');
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
+  const { isReceiving } = useWebRTC(sessionId, false); // Admin is always a listener
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
