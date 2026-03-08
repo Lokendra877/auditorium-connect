@@ -47,6 +47,44 @@ export type Database = {
         }
         Relationships: []
       }
+      audience_questions: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          is_answered: boolean
+          question: string
+          session_id: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          is_answered?: boolean
+          question: string
+          session_id: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          is_answered?: boolean
+          question?: string
+          session_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_questions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audio_recordings: {
         Row: {
           duration_seconds: number | null
@@ -112,6 +150,38 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_votes: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          option_index: number
+          poll_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          option_index: number
+          poll_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          option_index?: number
+          poll_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "session_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -132,6 +202,70 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      question_upvotes: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          question_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          question_id: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          question_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_upvotes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "audience_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_polls: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          options: Json
+          question: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_polls_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sessions: {
         Row: {
@@ -209,6 +343,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "speaker_queue_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_notifications: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          is_read: boolean
+          message: string
+          session_id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          is_read?: boolean
+          message: string
+          session_id: string
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          session_id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_notifications_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "sessions"

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Mic2 } from 'lucide-react';
+import animeMicHero from '@/assets/anime-mic-hero.png';
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -18,13 +19,13 @@ export function SaaSNavbar() {
   const location = useLocation();
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b-2 border-border/50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <Mic2 className="w-5 h-5 text-primary-foreground" />
+          <div className="w-9 h-9 rounded-lg overflow-hidden">
+            <img src={animeMicHero} alt="SmartMic" className="w-full h-full object-contain" />
           </div>
-          <span className="font-heading text-lg font-bold tracking-tight">SmartMic</span>
+          <span className="font-heading text-2xl tracking-wide">SmartMic</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -33,9 +34,9 @@ export function SaaSNavbar() {
             <Link
               key={link.path}
               to={link.path}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
                 location.pathname === link.path
-                  ? 'text-primary bg-primary/10'
+                  ? 'text-primary bg-primary/10 border-2 border-primary/30 shadow-anime'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/20'
               }`}
             >
@@ -46,11 +47,11 @@ export function SaaSNavbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <Link to="/saas-login">
-            <Button variant="ghost" size="sm">Log In</Button>
+            <Button variant="ghost" size="sm" className="font-heading tracking-wide">Log In</Button>
           </Link>
           <Link to="/saas-login?mode=signup">
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Start Free Trial
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-heading tracking-wide shadow-anime">
+              Start Free Trial ✨
             </Button>
           </Link>
         </div>
@@ -68,7 +69,7 @@ export function SaaSNavbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-border/50 bg-background"
+            className="lg:hidden border-t-2 border-border/50 bg-background"
           >
             <div className="container mx-auto px-4 py-4 space-y-1">
               {navLinks.map(link => (
@@ -87,10 +88,10 @@ export function SaaSNavbar() {
               ))}
               <div className="pt-3 flex flex-col gap-2">
                 <Link to="/saas-login" onClick={() => setOpen(false)}>
-                  <Button variant="outline" className="w-full">Log In</Button>
+                  <Button variant="outline" className="w-full border-2 font-heading tracking-wide">Log In</Button>
                 </Link>
                 <Link to="/saas-login?mode=signup" onClick={() => setOpen(false)}>
-                  <Button className="w-full bg-primary text-primary-foreground">Start Free Trial</Button>
+                  <Button className="w-full bg-primary text-primary-foreground font-heading tracking-wide shadow-anime">Start Free Trial ✨</Button>
                 </Link>
               </div>
             </div>
