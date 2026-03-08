@@ -30,6 +30,12 @@ export function AudioEqualizer({ onEQChange }: AudioEqualizerProps) {
     onEQChange(band, db);
   };
 
+  const applyPreset = (presetName: string) => {
+    const preset = PRESETS[presetName];
+    setGains(preset);
+    BANDS.forEach((b) => onEQChange(b.key, preset[b.key]));
+  };
+
   const resetAll = () => {
     setGains({ bass: 0, mid: 0, treble: 0 });
     BANDS.forEach((b) => onEQChange(b.key, 0));
