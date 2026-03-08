@@ -76,8 +76,7 @@ export default function SaaSHome() {
         {/* Background image */}
         <div className="absolute inset-0">
           <img src={auditoriumImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
-          <div className="absolute inset-0 gradient-hero opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
         </div>
         {/* Colorful blob shapes */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px] animate-float" />
@@ -110,13 +109,13 @@ export default function SaaSHome() {
               Enterprise-Grade Auditorium Solution
             </motion.div>
 
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8">
+            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl leading-tight mb-8 drop-shadow-lg">
               Smart, Contactless{' '}
               <span className="text-gradient">Microphone System</span>{' '}
               for Auditoriums
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto mb-12 leading-relaxed drop-shadow-sm">
               Turn smartphones into controlled microphones using QR-based access. 
               Eliminate mic passing, maintain hygiene, and bring order to every session.
             </p>
