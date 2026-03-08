@@ -22,7 +22,7 @@ export function SaaSNavbar() {
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-1 group">
-          <img src={smartmicLogo} alt="SmartMic" className="h-20 w-auto group-hover:scale-105 transition-transform" />
+          <img src={smartmicLogo} alt="SmartMic" className="h-24 w-auto group-hover:scale-105 transition-transform" />
         </Link>
 
         {/* Desktop Nav */}
