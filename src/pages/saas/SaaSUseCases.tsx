@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import conferenceHallImage from '@/assets/conference-hall.jpg';
 import { GraduationCap, Building2, Landmark, Presentation, Cpu } from 'lucide-react';
 
 const fadeUp = {
