@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Loader2, Plus, LogOut, Mic, ExternalLink, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdminNotifications } from '@/components/AdminNotifications';
 
 interface Session {
   id: string;
