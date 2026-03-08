@@ -17,6 +17,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
   const [options, setOptions] = useState(['', '']);
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [isMultiSelect, setIsMultiSelect] = useState(false);
 
   const addOption = () => {
     if (options.length < 6) setOptions([...options, '']);
