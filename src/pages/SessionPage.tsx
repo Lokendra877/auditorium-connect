@@ -49,6 +49,7 @@ export default function SessionPage() {
 
   const [userName, setUserName] = useState(savedName);
   const [userEmail, setUserEmail] = useState(savedEmail);
+  const [emailError, setEmailError] = useState('');
   const [hasJoined, setHasJoined] = useState(!!savedName && !!savedEmail);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
