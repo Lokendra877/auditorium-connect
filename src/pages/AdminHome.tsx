@@ -99,6 +99,25 @@ export default function AdminHome() {
     toast.success('Session created!');
   };
 
+  const deleteSession = async (sessionId: string) => {
+    setDeleting(true);
+    const { error } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (error) {
+      toast.error('Failed to delete session');
+      setDeleting(false);
+      return;
+    }
+
+    setSessions(prev => prev.filter(s => s.id !== sessionId));
+    setDeleteConfirm(null);
+    setDeleting(false);
+    toast.success('Session deleted');
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/');
