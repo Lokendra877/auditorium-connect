@@ -118,6 +118,23 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
             </Label>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Timer className="w-4 h-4 text-muted-foreground" />
+          <Label className="text-xs">Auto-close after:</Label>
+          <Select value={timerDuration} onValueChange={setTimerDuration}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">No timer</SelectItem>
+              <SelectItem value="30">30 seconds</SelectItem>
+              <SelectItem value="60">1 minute</SelectItem>
+              <SelectItem value="120">2 minutes</SelectItem>
+              <SelectItem value="300">5 minutes</SelectItem>
+              <SelectItem value="600">10 minutes</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex gap-2 pt-1">
           <Button onClick={createPoll} disabled={creating} className="bg-primary text-primary-foreground">
             <Send className="w-4 h-4 mr-1" /> {creating ? 'Creating...' : 'Launch Poll'}
