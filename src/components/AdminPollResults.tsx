@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText } from 'lucide-react';
+import { BarChart3, ChevronDown, ChevronUp, Users, User, XCircle, Download, FileText, Timer } from 'lucide-react';
+import { usePollCountdown, formatCountdown } from '@/hooks/usePollCountdown';
 import { toast } from 'sonner';
 import { exportPollResultsCSV, exportPollResultsPDF } from '@/lib/exportPollData';
 
@@ -13,6 +14,7 @@ interface Poll {
   options: string[];
   is_active: boolean;
   is_multi_select: boolean;
+  closes_at: string | null;
   created_at: string;
 }
 
@@ -58,6 +60,7 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
       ...p,
       options: (p.options as unknown as string[]) || [],
       is_multi_select: (p as any).is_multi_select ?? false,
+      closes_at: (p as any).closes_at ?? null,
     }));
     setPolls(parsed);
 
@@ -129,43 +132,57 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
   return (
     <div className="space-y-3">
       <AnimatePresence>
-        {polls.map(poll => {
-          const votes = pollVotes[poll.id] || [];
-          const uniqueVoters = new Set(votes.map(v => v.device_id)).size;
-          const totalVotes = votes.length;
-          const isExpanded = expandedPoll === poll.id;
+        {polls.map(poll => <PollCard key={poll.id} poll={poll} pollVotes={pollVotes} expandedPoll={expandedPoll} setExpandedPoll={setExpandedPoll} closing={closing} closePoll={closePoll} reopenPoll={reopenPoll} />)}
+      </AnimatePresence>
+    </div>
+  );
+}
 
-          const optionCounts: Record<number, number> = {};
-          poll.options.forEach((_, idx) => { optionCounts[idx] = 0; });
-          votes.forEach(v => { optionCounts[v.option_index] = (optionCounts[v.option_index] || 0) + 1; });
+function PollCard({ poll, pollVotes, expandedPoll, setExpandedPoll, closing, closePoll, reopenPoll }: {
+  poll: Poll; pollVotes: Record<string, VoteDetail[]>; expandedPoll: string | null; setExpandedPoll: (id: string | null) => void; closing: string | null; closePoll: (id: string) => void; reopenPoll: (id: string) => void;
+}) {
+  const countdown = usePollCountdown(poll.id, poll.closes_at, poll.is_active);
+  const votes = pollVotes[poll.id] || [];
+  const uniqueVoters = new Set(votes.map(v => v.device_id)).size;
+  const totalVotes = votes.length;
+  const isExpanded = expandedPoll === poll.id;
 
-          const votersByOption: Record<number, VoteDetail[]> = {};
-          poll.options.forEach((_, idx) => { votersByOption[idx] = []; });
-          votes.forEach(v => {
-            if (!votersByOption[v.option_index]) votersByOption[v.option_index] = [];
-            votersByOption[v.option_index].push(v);
-          });
+  const optionCounts: Record<number, number> = {};
+  poll.options.forEach((_, idx) => { optionCounts[idx] = 0; });
+  votes.forEach(v => { optionCounts[v.option_index] = (optionCounts[v.option_index] || 0) + 1; });
 
-          return (
-            <motion.div key={poll.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className={`shadow-sm border overflow-hidden ${!poll.is_active ? 'opacity-80' : ''}`}>
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="font-heading text-base flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-primary" />
-                      {poll.question}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Users className="w-3 h-3" /> {uniqueVoters} voter{uniqueVoters !== 1 ? 's' : ''}
-                        {poll.is_multi_select && <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded ml-1">Multi-select</span>}
-                      </span>
-                      {!poll.is_active && (
-                        <span className="text-[10px] bg-destructive/15 text-destructive px-1.5 py-0.5 rounded font-medium">Closed</span>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
+  const votersByOption: Record<number, VoteDetail[]> = {};
+  poll.options.forEach((_, idx) => { votersByOption[idx] = []; });
+  votes.forEach(v => {
+    if (!votersByOption[v.option_index]) votersByOption[v.option_index] = [];
+    votersByOption[v.option_index].push(v);
+  });
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+      <Card className={`shadow-sm border overflow-hidden ${!poll.is_active ? 'opacity-80' : ''}`}>
+        <CardHeader className="pb-2 pt-4 px-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-heading text-base flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" />
+              {poll.question}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              {poll.is_active && countdown !== null && countdown > 0 && (
+                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded flex items-center gap-1 ${countdown <= 10 ? 'bg-destructive/15 text-destructive animate-pulse' : 'bg-accent/15 text-accent-foreground'}`}>
+                  <Timer className="w-3 h-3" /> {formatCountdown(countdown)}
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Users className="w-3 h-3" /> {uniqueVoters} voter{uniqueVoters !== 1 ? 's' : ''}
+                {poll.is_multi_select && <span className="text-[10px] bg-primary/15 text-primary px-1.5 py-0.5 rounded ml-1">Multi-select</span>}
+              </span>
+              {!poll.is_active && (
+                <span className="text-[10px] bg-destructive/15 text-destructive px-1.5 py-0.5 rounded font-medium">Closed</span>
+              )}
+            </div>
+          </div>
+        </CardHeader>
                 <CardContent className="px-4 pb-4 space-y-2">
                   {/* Percentage bars */}
                   {poll.options.map((option, idx) => {
@@ -296,8 +313,4 @@ export function AdminPollResults({ sessionId }: AdminPollResultsProps) {
               </Card>
             </motion.div>
           );
-        })}
-      </AnimatePresence>
-    </div>
-  );
 }

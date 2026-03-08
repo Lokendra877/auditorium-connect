@@ -5,8 +5,9 @@ import { getDeviceId } from '@/lib/device-id';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BarChart3, Check, Send } from 'lucide-react';
+import { BarChart3, Check, Send, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePollCountdown, formatCountdown } from '@/hooks/usePollCountdown';
 
 interface Poll {
   id: string;
@@ -14,6 +15,7 @@ interface Poll {
   options: string[];
   is_active: boolean;
   is_multi_select: boolean;
+  closes_at: string | null;
 }
 
 interface SessionPollsProps {
@@ -53,6 +55,7 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
         ...p,
         options: (p.options as unknown as string[]) || [],
         is_multi_select: (p as any).is_multi_select ?? false,
+        closes_at: (p as any).closes_at ?? null,
       }));
       setPolls(parsed);
       for (const p of parsed) {
@@ -141,107 +144,127 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
         <BarChart3 className="w-4 h-4" /> Active Polls
       </h3>
       <AnimatePresence>
-        {polls.map(poll => {
-          const voted = myVotes[poll.id]?.length > 0;
-          const counts = voteCounts[poll.id] || {};
-          const totalVotes = Object.values(counts).reduce((a, b) => a + b, 0);
-          const pending = pendingSelections[poll.id] || new Set();
-
-          return (
-            <motion.div key={poll.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="anime-card overflow-hidden">
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <CardTitle className="font-heading text-base">{poll.question}</CardTitle>
-                  {poll.is_multi_select && !voted && (
-                    <p className="text-xs text-muted-foreground">✅ Select multiple options</p>
-                  )}
-                </CardHeader>
-                <CardContent className="px-4 pb-4 space-y-2">
-                  {poll.options.map((option, idx) => {
-                    const count = counts[idx] || 0;
-                    const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-                    const isMyVote = myVotes[poll.id]?.includes(idx);
-                    const isSelected = pending.has(idx);
-
-                    if (poll.is_multi_select && !voted) {
-                      // Checkbox mode before voting
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => togglePendingSelection(poll.id, idx)}
-                          className={`w-full rounded-lg px-4 py-3 text-left text-sm font-medium transition-all border-2 flex items-center gap-3 ${
-                            isSelected
-                              ? 'bg-primary/15 border-primary'
-                              : 'bg-muted/10 border-border hover:border-primary/50 hover:bg-primary/5'
-                          }`}
-                        >
-                          <Checkbox checked={isSelected} className="pointer-events-none" />
-                          {option}
-                        </button>
-                      );
-                    }
-
-                    // Single select or already voted view
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => !poll.is_multi_select && handleSingleVote(poll.id, idx)}
-                        disabled={voted}
-                        className={`w-full relative rounded-lg px-4 py-3 text-left text-sm font-medium transition-all overflow-hidden ${
-                          isMyVote
-                            ? 'bg-primary/15 border-2 border-primary'
-                            : voted
-                            ? 'bg-muted/10 border-2 border-border'
-                            : 'bg-muted/10 border-2 border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer'
-                        }`}
-                      >
-                        {voted && (
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 0.5 }}
-                            className="absolute inset-y-0 left-0 bg-primary/10 rounded-lg"
-                          />
-                        )}
-                        <span className="relative flex items-center justify-between">
-                          <span className="flex items-center gap-2">
-                            {isMyVote && <Check className="w-4 h-4 text-primary" />}
-                            {option}
-                          </span>
-                          {voted && (
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {pct}% ({count})
-                            </span>
-                          )}
-                        </span>
-                      </button>
-                    );
-                  })}
-
-                  {/* Submit button for multi-select */}
-                  {poll.is_multi_select && !voted && (
-                    <Button
-                      onClick={() => submitMultiVote(poll.id)}
-                      disabled={submitting === poll.id || pending.size === 0}
-                      className="w-full mt-1 bg-primary text-primary-foreground"
-                      size="sm"
-                    >
-                      <Send className="w-4 h-4 mr-1" />
-                      {submitting === poll.id ? 'Submitting...' : `Submit Vote (${pending.size} selected)`}
-                    </Button>
-                  )}
-
-                  {totalVotes > 0 && (
-                    <p className="text-xs text-muted-foreground text-center pt-1">
-                      {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
+        {polls.map(poll => (
+          <PollCard
+            key={poll.id}
+            poll={poll}
+            myVotes={myVotes[poll.id] || []}
+            counts={voteCounts[poll.id] || {}}
+            pending={pendingSelections[poll.id] || new Set()}
+            submitting={submitting === poll.id}
+            onSingleVote={(idx) => handleSingleVote(poll.id, idx)}
+            onToggle={(idx) => togglePendingSelection(poll.id, idx)}
+            onSubmitMulti={() => submitMultiVote(poll.id)}
+          />
+        ))}
       </AnimatePresence>
     </div>
+  );
+}
+
+function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, onToggle, onSubmitMulti }: {
+  poll: Poll; myVotes: number[]; counts: Record<number, number>; pending: Set<number>;
+  submitting: boolean; onSingleVote: (idx: number) => void; onToggle: (idx: number) => void; onSubmitMulti: () => void;
+}) {
+  const countdown = usePollCountdown(poll.id, poll.closes_at, poll.is_active);
+  const voted = myVotes.length > 0;
+  const totalVotes = Object.values(counts).reduce((a, b) => a + b, 0);
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+      <Card className="anime-card overflow-hidden">
+        <CardHeader className="pb-2 pt-4 px-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-heading text-base">{poll.question}</CardTitle>
+            {countdown !== null && countdown > 0 && (
+              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded flex items-center gap-1 ${countdown <= 10 ? 'bg-destructive/15 text-destructive animate-pulse' : 'bg-muted/30 text-muted-foreground'}`}>
+                <Timer className="w-3 h-3" /> {formatCountdown(countdown)}
+              </span>
+            )}
+          </div>
+          {poll.is_multi_select && !voted && (
+            <p className="text-xs text-muted-foreground">✅ Select multiple options</p>
+          )}
+        </CardHeader>
+        <CardContent className="px-4 pb-4 space-y-2">
+          {poll.options.map((option, idx) => {
+            const count = counts[idx] || 0;
+            const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+            const isMyVote = myVotes.includes(idx);
+            const isSelected = pending.has(idx);
+
+            if (poll.is_multi_select && !voted) {
+              return (
+                <button
+                  key={idx}
+                  onClick={() => onToggle(idx)}
+                  className={`w-full rounded-lg px-4 py-3 text-left text-sm font-medium transition-all border-2 flex items-center gap-3 ${
+                    isSelected
+                      ? 'bg-primary/15 border-primary'
+                      : 'bg-muted/10 border-border hover:border-primary/50 hover:bg-primary/5'
+                  }`}
+                >
+                  <Checkbox checked={isSelected} className="pointer-events-none" />
+                  {option}
+                </button>
+              );
+            }
+
+            return (
+              <button
+                key={idx}
+                onClick={() => !poll.is_multi_select && onSingleVote(idx)}
+                disabled={voted}
+                className={`w-full relative rounded-lg px-4 py-3 text-left text-sm font-medium transition-all overflow-hidden ${
+                  isMyVote
+                    ? 'bg-primary/15 border-2 border-primary'
+                    : voted
+                    ? 'bg-muted/10 border-2 border-border'
+                    : 'bg-muted/10 border-2 border-border hover:border-primary/50 hover:bg-primary/5 cursor-pointer'
+                }`}
+              >
+                {voted && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-y-0 left-0 bg-primary/10 rounded-lg"
+                  />
+                )}
+                <span className="relative flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    {isMyVote && <Check className="w-4 h-4 text-primary" />}
+                    {option}
+                  </span>
+                  {voted && (
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {pct}% ({count})
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+
+          {poll.is_multi_select && !voted && (
+            <Button
+              onClick={onSubmitMulti}
+              disabled={submitting || pending.size === 0}
+              className="w-full mt-1 bg-primary text-primary-foreground"
+              size="sm"
+            >
+              <Send className="w-4 h-4 mr-1" />
+              {submitting ? 'Submitting...' : `Submit Vote (${pending.size} selected)`}
+            </Button>
+          )}
+
+          {totalVotes > 0 && (
+            <p className="text-xs text-muted-foreground text-center pt-1">
+              {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

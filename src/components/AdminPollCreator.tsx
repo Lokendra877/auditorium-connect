@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, X, Send, BarChart3, CheckSquare } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, X, Send, BarChart3, CheckSquare, Timer } from 'lucide-react';
 import { toast } from 'sonner';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -18,6 +19,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
   const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [isMultiSelect, setIsMultiSelect] = useState(false);
+  const [timerDuration, setTimerDuration] = useState('0'); // 0 = no timer, value in seconds
 
   const addOption = () => {
     if (options.length < 6) setOptions([...options, '']);
@@ -33,6 +35,8 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
     if (validOptions.length < 2) { toast.error('Need at least 2 options'); return; }
 
     setCreating(true);
+    const durationSec = parseInt(timerDuration);
+    const closesAt = durationSec > 0 ? new Date(Date.now() + durationSec * 1000).toISOString() : null;
     const { error } = await supabase
       .from('session_polls')
       .insert({
@@ -40,6 +44,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
         question: question.trim(),
         options: validOptions as unknown as any,
         is_multi_select: isMultiSelect,
+        closes_at: closesAt,
       } as any);
 
     if (error) {
@@ -49,6 +54,7 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
       setQuestion('');
       setOptions(['', '']);
       setIsMultiSelect(false);
+      setTimerDuration('0');
       setShowForm(false);
     }
     setCreating(false);
@@ -111,6 +117,23 @@ export function AdminPollCreator({ sessionId }: AdminPollCreatorProps) {
               <CheckSquare className="w-3 h-3" /> Allow multiple selections
             </Label>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Timer className="w-4 h-4 text-muted-foreground" />
+          <Label className="text-xs">Auto-close after:</Label>
+          <Select value={timerDuration} onValueChange={setTimerDuration}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">No timer</SelectItem>
+              <SelectItem value="30">30 seconds</SelectItem>
+              <SelectItem value="60">1 minute</SelectItem>
+              <SelectItem value="120">2 minutes</SelectItem>
+              <SelectItem value="300">5 minutes</SelectItem>
+              <SelectItem value="600">10 minutes</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex gap-2 pt-1">
           <Button onClick={createPoll} disabled={creating} className="bg-primary text-primary-foreground">
