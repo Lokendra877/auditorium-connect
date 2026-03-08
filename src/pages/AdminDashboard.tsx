@@ -67,8 +67,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const currentSpeaker = queue.find(e => e.status === 'speaking');
-  const waitingCount = queue.filter(e => e.status === 'waiting').length;
 
   const handleTimeUp = useCallback(async () => {
     if (currentSpeaker) {
