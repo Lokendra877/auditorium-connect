@@ -25,10 +25,19 @@ export default function AdminDashboard() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const adminCode = searchParams.get('code');
+  const [volume, setVolume] = useState(100);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
-  const { isReceiving } = useWebRTC(sessionId, false);
+  const { isReceiving, remoteAudioRef } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
+
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (remoteAudioRef?.current) {
+      remoteAudioRef.current.volume = newVolume / 100;
+    }
+  };
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
