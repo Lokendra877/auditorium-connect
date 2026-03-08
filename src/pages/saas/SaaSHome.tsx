@@ -113,20 +113,62 @@ export default function SaaSHome() {
             </div>
           </motion.div>
 
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
-          >
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> No hardware needed</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Works on any smartphone</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Setup in under 2 minutes</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Enterprise-ready security</div>
-          </motion.div>
-        </div>
-      </section>
+           {/* Trust badges */}
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.5, duration: 0.6 }}
+             className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground"
+           >
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> No hardware needed</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Works on any smartphone</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Setup in under 2 minutes</div>
+             <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" /> Enterprise-ready security</div>
+           </motion.div>
+
+           {/* Testimonials */}
+           <motion.div
+             initial={{ opacity: 0, y: 24 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.7, duration: 0.6 }}
+             className="mt-20 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto"
+           >
+             {testimonials.map((testimonial, i) => (
+               <Card key={i} className="border-0 bg-white/50 backdrop-blur-sm shadow-[var(--shadow-md)]">
+                 <CardContent className="p-6 space-y-4">
+                   <div className="flex gap-1">
+                     {[...Array(5)].map((_, i) => (
+                       <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                     ))}
+                   </div>
+                   <p className="text-sm italic text-foreground">&quot;{testimonial.quote}&quot;</p>
+                   <div className="pt-2 border-t border-border">
+                     <p className="font-semibold text-sm">{testimonial.author}</p>
+                     <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                     <p className="text-xs text-primary font-medium mt-1">{testimonial.institution}</p>
+                   </div>
+                 </CardContent>
+               </Card>
+             ))}
+           </motion.div>
+
+           {/* Institution Logos / Trust Badges */}
+           <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             transition={{ delay: 0.9, duration: 0.6 }}
+             className="mt-16"
+           >
+             <p className="text-center text-xs text-muted-foreground uppercase tracking-widest font-semibold mb-6">Trusted by leading institutions</p>
+             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+               {institutions.map((inst, i) => (
+                 <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                   <div className="w-2 h-2 rounded-full bg-primary" />
+                   <span className="font-medium">{inst}</span>
+                 </div>
+               ))}
+             </div>
+           </motion.div>
 
       {/* Problem Section */}
       <section className="py-20 bg-card/50">
