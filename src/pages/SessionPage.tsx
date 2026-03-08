@@ -101,8 +101,35 @@ export default function SessionPage() {
     ? waitingQueue.findIndex(e => e.id === myEntry.id) + 1
     : null;
 
+  const validateEmail = (email: string): boolean => {
+    const trimmed = email.trim();
+    // Basic format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if (!emailRegex.test(trimmed)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    // Block disposable/temporary email domains
+    const disposableDomains = [
+      'tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com',
+      'yopmail.com', 'sharklasers.com', 'guerrillamailblock.com', 'grr.la',
+      'dispostable.com', 'trashmail.com', 'fakeinbox.com', 'tempail.com',
+      'temp-mail.org', 'minutemail.com', 'maildrop.cc', 'harakirimail.com',
+      'getairmail.com', 'meltmail.com', 'discard.email', '10minutemail.com',
+      'getnada.com', 'mohmal.com', 'emailondeck.com', 'trashmail.me',
+    ];
+    const domain = trimmed.split('@')[1]?.toLowerCase();
+    if (disposableDomains.includes(domain)) {
+      setEmailError('Disposable email addresses are not allowed');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
   const handleJoin = () => {
     if (!userName.trim() || !userEmail.trim()) return;
+    if (!validateEmail(userEmail)) return;
     setCookie('smartmic_user_name', userName.trim());
     setCookie('smartmic_user_email', userEmail.trim());
     setHasJoined(true);
