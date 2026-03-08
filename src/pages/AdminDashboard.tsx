@@ -19,7 +19,9 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Power, PlayCircle, Users, Clock, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { RecordingsList } from '@/components/RecordingsList';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -31,6 +33,31 @@ export default function AdminDashboard() {
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker } = useQueueActions(sessionId);
   const { isReceiving, remoteAudioRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
+  const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
+  const prevSpeakerRef = useRef<string | null>(null);
+
+  // Auto-record when a speaker starts, auto-stop when they finish
+  const currentSpeaker = queue.find(e => e.status === 'speaking');
+  const waitingCount = queue.filter(e => e.status === 'waiting').length;
+
+  useEffect(() => {
+    const currentId = currentSpeaker?.id || null;
+    const prevId = prevSpeakerRef.current;
+
+    if (currentId && currentId !== prevId) {
+      // New speaker started - begin recording after a short delay for stream to establish
+      setTimeout(() => {
+        if (remoteAudioRef?.current) {
+          startRecording(remoteAudioRef.current, currentSpeaker!.user_name);
+        }
+      }, 1000);
+    } else if (!currentId && prevId && isRecording) {
+      // Speaker finished - stop recording
+      stopRecording();
+    }
+
+    prevSpeakerRef.current = currentId;
+  }, [currentSpeaker?.id]);
 
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];
@@ -40,8 +67,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const currentSpeaker = queue.find(e => e.status === 'speaking');
-  const waitingCount = queue.filter(e => e.status === 'waiting').length;
 
   const handleTimeUp = useCallback(async () => {
     if (currentSpeaker) {
@@ -206,8 +231,9 @@ export default function AdminDashboard() {
           </div>
 
           {/* Analytics */}
-          <div>
+          <div className="space-y-4">
             <AnalyticsPanel analytics={analyticsData} />
+            <RecordingsList sessionId={session.id} />
           </div>
         </div>
       </div>
