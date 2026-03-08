@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   QrCode, Users, ShieldCheck, Mic2, BarChart3, Cloud,
   ArrowRight, CheckCircle2, Timer, AlertTriangle, Handshake,
-  MessageSquare, Smartphone, ListOrdered, Volume2, Fingerprint
+  MessageSquare, Smartphone, ListOrdered, Volume2, Fingerprint,
+  Star
 } from 'lucide-react';
 
 const fadeUp = {
