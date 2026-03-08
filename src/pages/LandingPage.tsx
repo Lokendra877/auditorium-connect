@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mic, Mic2, Users, QrCode, Timer, Shield, Zap } from 'lucide-react';
+import { Mic, Users, QrCode, Timer, Shield, Zap } from 'lucide-react';
+import smartmicLogo from '@/assets/smartmic-logo.png';
 import { toast } from 'sonner';
 
 export default function LandingPage() {
