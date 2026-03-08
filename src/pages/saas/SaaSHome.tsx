@@ -120,19 +120,6 @@ export default function SaaSHome() {
               Eliminate mic passing, maintain hygiene, and bring order to every session.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/app">
-                <Button size="lg" className="gradient-primary text-primary-foreground text-base px-10 h-14 font-heading font-semibold rounded-xl shadow-colored hover:opacity-90 transition-opacity">
-                  Start Free Demo
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-              </Link>
-              <Link to="/pricing">
-                <Button variant="outline" size="lg" className="text-base px-10 h-14 font-heading font-semibold rounded-xl border-2 border-white/30 text-white hover:bg-white/10 hover:text-white">
-                  View Pricing
-                </Button>
-              </Link>
-            </div>
           </motion.div>
 
            {/* Trust badges */}
