@@ -141,6 +141,8 @@ export default function SessionPage() {
               translatedText={translatedSubtitle}
               isTranslating={isTranslating}
               targetLanguage={targetLanguage}
+              ttsEnabled={ttsEnabled}
+              onToggleTts={() => setTtsEnabled(prev => !prev)}
             />
           </div>
         )}
