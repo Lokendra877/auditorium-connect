@@ -38,6 +38,8 @@ export default function AdminHome() {
   const [speakingTime, setSpeakingTime] = useState(30);
   const [showCreate, setShowCreate] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
