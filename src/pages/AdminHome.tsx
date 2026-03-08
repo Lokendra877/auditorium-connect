@@ -145,7 +145,8 @@ export default function AdminHome() {
             <h1 className="font-heading text-2xl font-bold">My Sessions</h1>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <AdminNotifications />
             <Button variant="hero" size="sm" onClick={() => setShowCreate(true)}>
               <Plus className="w-4 h-4 mr-1" /> New Session
             </Button>
