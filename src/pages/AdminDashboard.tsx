@@ -47,8 +47,8 @@ export default function AdminDashboard() {
     if (currentId && currentId !== prevId) {
       // New speaker started - begin recording after a short delay for stream to establish
       setTimeout(() => {
-        if (remoteAudioRef?.current) {
-          startRecording(remoteAudioRef.current, currentSpeaker!.user_name);
+        if (remoteStreamRef?.current) {
+          startRecording(remoteStreamRef.current, currentSpeaker!.user_name);
         }
       }, 1000);
     } else if (!currentId && prevId && isRecording) {
