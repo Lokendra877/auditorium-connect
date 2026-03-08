@@ -1,15 +1,27 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getDeviceId } from '@/lib/device-id';
 import { toast } from 'sonner';
 
+const RATE_LIMIT_COOLDOWN_MS = 30_000; // 30s between requests per device
+
 export function useQueueActions(sessionId: string | undefined) {
   const deviceId = getDeviceId();
+  const lastRequestRef = useRef<number>(0);
 
   const requestToSpeak = useCallback(async (userName: string) => {
     if (!sessionId) return;
 
-    // Check for duplicate
+    // Client-side rate limit
+    const now = Date.now();
+    const elapsed = now - lastRequestRef.current;
+    if (elapsed < RATE_LIMIT_COOLDOWN_MS) {
+      const waitSec = Math.ceil((RATE_LIMIT_COOLDOWN_MS - elapsed) / 1000);
+      toast.error(`Please wait ${waitSec}s before requesting again`);
+      return;
+    }
+
+    // Check for duplicate active request
     const { data: existing } = await supabase
       .from('speaker_queue')
       .select('id')
@@ -20,6 +32,26 @@ export function useQueueActions(sessionId: string | undefined) {
     if (existing && existing.length > 0) {
       toast.error('You already have an active request');
       return;
+    }
+
+    // Server-side cooldown: check last finished/skipped entry from this device
+    const { data: recent } = await supabase
+      .from('speaker_queue')
+      .select('finished_speaking_at')
+      .eq('session_id', sessionId)
+      .eq('device_id', deviceId)
+      .in('status', ['done', 'skipped'])
+      .order('finished_speaking_at', { ascending: false })
+      .limit(1);
+
+    if (recent && recent.length > 0 && recent[0].finished_speaking_at) {
+      const finishedAt = new Date(recent[0].finished_speaking_at).getTime();
+      const serverElapsed = now - finishedAt;
+      if (serverElapsed < RATE_LIMIT_COOLDOWN_MS) {
+        const waitSec = Math.ceil((RATE_LIMIT_COOLDOWN_MS - serverElapsed) / 1000);
+        toast.error(`Please wait ${waitSec}s before requesting again`);
+        return;
+      }
     }
 
     // Get next position
@@ -45,6 +77,7 @@ export function useQueueActions(sessionId: string | undefined) {
     if (error) {
       toast.error('Failed to join queue');
     } else {
+      lastRequestRef.current = Date.now();
       toast.success('Added to speaker queue!');
     }
   }, [sessionId, deviceId]);
