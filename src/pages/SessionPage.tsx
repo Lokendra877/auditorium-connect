@@ -56,6 +56,8 @@ export default function SessionPage() {
 
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const myEntry = queue.find(e => e.device_id === deviceId);
+  const amISpeaking = myEntry?.status === 'speaking';
+  const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
   const waitingQueue = queue.filter(e => e.status === 'waiting');
   const myPosition = myEntry && myEntry.status === 'waiting'
     ? waitingQueue.findIndex(e => e.id === myEntry.id) + 1
