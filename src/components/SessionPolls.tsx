@@ -5,9 +5,10 @@ import { getDeviceId } from '@/lib/device-id';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { BarChart3, Check, Send, Timer } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { BarChart3, Check, Send, Timer, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { usePollCountdown, formatCountdown } from '@/hooks/usePollCountdown';
+import { usePollCountdown, formatCountdown, calcProgressPercent } from '@/hooks/usePollCountdown';
 
 interface Poll {
   id: string;
@@ -16,6 +17,7 @@ interface Poll {
   is_active: boolean;
   is_multi_select: boolean;
   closes_at: string | null;
+  created_at: string;
 }
 
 interface SessionPollsProps {
@@ -107,6 +109,22 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
     }
   };
 
+  const changeVote = async (pollId: string) => {
+    // Delete existing votes for this poll
+    const { error } = await supabase
+      .from('poll_votes')
+      .delete()
+      .eq('poll_id', pollId)
+      .eq('device_id', deviceId);
+    if (!error) {
+      setMyVotes(prev => { const n = { ...prev }; delete n[pollId]; return n; });
+      setPendingSelections(prev => { const n = { ...prev }; delete n[pollId]; return n; });
+      toast.success('Vote cleared — choose again!');
+    } else {
+      toast.error('Failed to change vote');
+    }
+  };
+
   const togglePendingSelection = (pollId: string, optionIndex: number) => {
     setPendingSelections(prev => {
       const current = new Set(prev[pollId] || []);
@@ -155,6 +173,7 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
             onSingleVote={(idx) => handleSingleVote(poll.id, idx)}
             onToggle={(idx) => togglePendingSelection(poll.id, idx)}
             onSubmitMulti={() => submitMultiVote(poll.id)}
+            onChangeVote={() => changeVote(poll.id)}
           />
         ))}
       </AnimatePresence>
@@ -162,11 +181,12 @@ export function SessionPolls({ sessionId }: SessionPollsProps) {
   );
 }
 
-function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, onToggle, onSubmitMulti }: {
+function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, onToggle, onSubmitMulti, onChangeVote }: {
   poll: Poll; myVotes: number[]; counts: Record<number, number>; pending: Set<number>;
-  submitting: boolean; onSingleVote: (idx: number) => void; onToggle: (idx: number) => void; onSubmitMulti: () => void;
+  submitting: boolean; onSingleVote: (idx: number) => void; onToggle: (idx: number) => void; onSubmitMulti: () => void; onChangeVote: () => void;
 }) {
   const countdown = usePollCountdown(poll.id, poll.closes_at, poll.is_active);
+  const progressPct = poll.closes_at ? calcProgressPercent(poll.closes_at, poll.created_at) : null;
   const voted = myVotes.length > 0;
   const totalVotes = Object.values(counts).reduce((a, b) => a + b, 0);
 
@@ -182,6 +202,12 @@ function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, on
               </span>
             )}
           </div>
+          {/* Timer progress bar */}
+          {poll.closes_at && progressPct !== null && progressPct > 0 && (
+            <div className="mt-1.5">
+              <Progress value={progressPct} className="h-1" />
+            </div>
+          )}
           {poll.is_multi_select && !voted && (
             <p className="text-xs text-muted-foreground">✅ Select multiple options</p>
           )}
@@ -213,7 +239,7 @@ function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, on
             return (
               <button
                 key={idx}
-                onClick={() => !poll.is_multi_select && onSingleVote(idx)}
+                onClick={() => !poll.is_multi_select && !voted && onSingleVote(idx)}
                 disabled={voted}
                 className={`w-full relative rounded-lg px-4 py-3 text-left text-sm font-medium transition-all overflow-hidden ${
                   isMyVote
@@ -255,6 +281,18 @@ function PollCard({ poll, myVotes, counts, pending, submitting, onSingleVote, on
             >
               <Send className="w-4 h-4 mr-1" />
               {submitting ? 'Submitting...' : `Submit Vote (${pending.size} selected)`}
+            </Button>
+          )}
+
+          {/* Change vote button */}
+          {voted && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full mt-1 text-xs text-muted-foreground hover:text-foreground gap-1"
+              onClick={onChangeVote}
+            >
+              <RefreshCw className="w-3 h-3" /> Change my vote
             </Button>
           )}
 
