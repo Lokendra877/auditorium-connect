@@ -23,6 +23,7 @@ export default function SessionPage() {
   const [userName, setUserName] = useState('');
   const [hasJoined, setHasJoined] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
   const amISpeaking = myEntry?.status === 'speaking' || false;
@@ -32,7 +33,7 @@ export default function SessionPage() {
   useSpeechTranscription(sessionId, amISpeaking);
 
   // Listener: receive transcripts and translate
-  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage);
+  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
 
   if (loading) {
     return (
@@ -140,6 +141,8 @@ export default function SessionPage() {
               translatedText={translatedSubtitle}
               isTranslating={isTranslating}
               targetLanguage={targetLanguage}
+              ttsEnabled={ttsEnabled}
+              onToggleTts={() => setTtsEnabled(prev => !prev)}
             />
           </div>
         )}

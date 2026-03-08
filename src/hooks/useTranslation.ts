@@ -97,13 +97,16 @@ export function useSpeechTranscription(sessionId: string | undefined, isSpeaking
 
 export function useTranscriptListener(
   sessionId: string | undefined,
-  targetLanguage: string | null
+  targetLanguage: string | null,
+  ttsEnabled: boolean = true
 ) {
   const [subtitle, setSubtitle] = useState('');
   const [translatedSubtitle, setTranslatedSubtitle] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const translateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTranslatedRef = useRef('');
+  const ttsEnabledRef = useRef(ttsEnabled);
+  useEffect(() => { ttsEnabledRef.current = ttsEnabled; }, [ttsEnabled]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -147,7 +150,7 @@ export function useTranscriptListener(
       setTranslatedSubtitle(translated);
 
       // Text-to-speech
-      if ('speechSynthesis' in window && translated) {
+      if (ttsEnabledRef.current && 'speechSynthesis' in window && translated) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(translated);
         utterance.lang = getLanguageCode(lang);
