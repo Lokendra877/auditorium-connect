@@ -128,8 +128,3 @@ export function AdminNotifications() {
       )}
     </div>
   );
-}
-      )}
-    </div>
-  );
-}
