@@ -127,6 +127,16 @@ export default function SessionPage() {
     setHasJoined(false);
   };
 
+  const handleClearAllCookies = () => {
+    document.cookie.split(';').forEach((cookie) => {
+      const name = cookie.split('=')[0].trim();
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+    setUserName('');
+    setUserEmail('');
+    setHasJoined(false);
+  };
+
   if (!hasJoined) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-hero px-4 relative overflow-hidden">
