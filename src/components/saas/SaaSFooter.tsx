@@ -8,7 +8,7 @@ export function SaaSFooter() {
         <div className="grid md:grid-cols-4 gap-8">
           <div className="space-y-3">
             <div className="flex items-center gap-1">
-              <img src={smartmicLogo} alt="SmartMic" className="h-8 w-auto" />
+              <img src={smartmicLogo} alt="SmartMic" className="h-12 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Smart, contactless microphone system for modern auditoriums.
