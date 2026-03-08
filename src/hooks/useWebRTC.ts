@@ -519,6 +519,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     cleanupAll,
     remoteAudioRef,
     remoteStreamRef,
+    recordableStreamRef,
     setEQ,
     setVolume,
     enhancements,
