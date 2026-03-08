@@ -238,7 +238,7 @@ export default function AdminDashboard() {
               </TabsContent>
               <TabsContent value="polls" className="mt-3 space-y-3">
                 <AdminPollCreator sessionId={sessionId!} />
-                <SessionPolls sessionId={sessionId!} />
+                <AdminPollResults sessionId={sessionId!} />
               </TabsContent>
             </Tabs>
           </div>
