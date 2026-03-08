@@ -158,9 +158,29 @@ export default function AdminDashboard() {
             <h1 className="font-heading text-2xl font-bold">{session.title}</h1>
             <p className="text-sm text-muted-foreground">Admin Dashboard</p>
           </div>
-          <Button variant="destructive" size="sm" onClick={endSession}>
-            <Power className="w-4 h-4 mr-1" /> End Session
-          </Button>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-1" /> Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportCSV}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="destructive" size="sm" onClick={endSession}>
+              <Power className="w-4 h-4 mr-1" /> End Session
+            </Button>
+          </div>
         </motion.div>
 
         <div className="grid lg:grid-cols-4 gap-6">
