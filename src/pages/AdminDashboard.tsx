@@ -231,8 +231,9 @@ export default function AdminDashboard() {
           </div>
 
           {/* Analytics */}
-          <div>
+          <div className="space-y-4">
             <AnalyticsPanel analytics={analyticsData} />
+            <RecordingsList sessionId={session.id} />
           </div>
         </div>
       </div>
