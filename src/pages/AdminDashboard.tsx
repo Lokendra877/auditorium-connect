@@ -170,6 +170,11 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Analytics */}
+          <div>
+            <AnalyticsPanel analytics={analyticsData} />
+          </div>
         </div>
       </div>
     </div>
