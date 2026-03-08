@@ -14,7 +14,7 @@ import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { AudioEqualizer } from '@/components/AudioEqualizer';
 import { AdminPollCreator } from '@/components/AdminPollCreator';
 import { AdminQuestionsList } from '@/components/AdminQuestionsList';
-import { SessionPolls } from '@/components/SessionPolls';
+import { AdminPollResults } from '@/components/AdminPollResults';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
