@@ -76,8 +76,7 @@ export default function SaaSHome() {
         {/* Background image */}
         <div className="absolute inset-0">
           <img src={auditoriumImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
-          <div className="absolute inset-0 gradient-hero opacity-80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
         </div>
         {/* Colorful blob shapes */}
         <div className="absolute top-20 -left-20 w-72 h-72 bg-primary/10 blob-shape blur-[80px] animate-float" />

@@ -36,7 +36,7 @@ export default function SaaSFeatures() {
       <section className="relative overflow-hidden py-24 px-4">
         <div className="absolute inset-0">
           <img src={lectureHallImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-background/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
         </div>
         <div className="container mx-auto max-w-5xl relative z-10">
           <motion.div
