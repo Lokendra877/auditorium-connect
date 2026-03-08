@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { SaaSLayout } from '@/components/saas/SaaSLayout';
 import { Card, CardContent } from '@/components/ui/card';
+import lectureHallImage from '@/assets/lecture-hall.jpg';
 import {
   Fingerprint, ListOrdered, ShieldCheck, BarChart3, Mic2, Cloud,
   Headphones, Globe, FileText, Zap, Lock, Smartphone
