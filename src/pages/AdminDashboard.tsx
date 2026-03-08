@@ -10,6 +10,7 @@ import { QueueList } from '@/components/QueueList';
 import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
+import { AnalyticsPanel } from '@/components/AnalyticsPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
