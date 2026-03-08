@@ -116,6 +116,16 @@ export default function SessionPage() {
     }
   };
 
+  const hasSavedIdentity = !!(getCookie('smartmic_user_name') && getCookie('smartmic_user_email'));
+
+  const handleClearIdentity = () => {
+    setCookie('smartmic_user_name', '', -1);
+    setCookie('smartmic_user_email', '', -1);
+    setUserName('');
+    setUserEmail('');
+    setHasJoined(false);
+  };
+
   if (!hasJoined) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-hero px-4 relative overflow-hidden">
@@ -150,6 +160,15 @@ export default function SessionPage() {
                   className="text-center text-lg pl-10"
                 />
               </div>
+              {hasSavedIdentity && (
+                <button
+                  type="button"
+                  onClick={handleClearIdentity}
+                  className="w-full text-center text-xs text-muted-foreground hover:text-primary underline underline-offset-2 transition-colors"
+                >
+                  Not you? Clear saved details
+                </button>
+              )}
               <Button className="w-full gradient-primary text-primary-foreground font-heading font-semibold text-lg shadow-colored hover:opacity-90 transition-opacity h-12" onClick={handleJoin} disabled={!userName.trim() || !userEmail.trim()}>
                 Join Session
               </Button>
