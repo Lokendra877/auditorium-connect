@@ -128,6 +128,26 @@ export default function AdminDashboard() {
               isReceiving={isReceiving}
               micError={null}
             />
+            <Card className="border-0 shadow-[var(--shadow-sm)]">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-primary" />
+                  <Label htmlFor="volume" className="text-xs text-muted-foreground">
+                    Speaker Volume
+                  </Label>
+                </div>
+                <Slider
+                  id="volume"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={[volume]}
+                  onValueChange={handleVolumeChange}
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground text-right">{volume}%</p>
+              </CardContent>
+            </Card>
             <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
               <CardHeader>
                 <CardTitle className="font-heading text-lg">Current Speaker</CardTitle>
