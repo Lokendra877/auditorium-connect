@@ -39,7 +39,7 @@ const App = () => (
           <Route path="/use-cases" element={<SaaSUseCases />} />
           <Route path="/architecture" element={<SaaSArchitecture />} />
           <Route path="/contact" element={<SaaSContact />} />
-          <Route path="/saas-login" element={<SaaSLogin />} />
+          
           <Route path="/admin-demo" element={<SaaSAdminDemo />} />
 
           {/* Existing App */}

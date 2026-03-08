@@ -86,10 +86,10 @@ export function SaaSNavbar() {
                 </Link>
               ))}
               <div className="pt-3 flex flex-col gap-2">
-                <Link to="/saas-login" onClick={() => setOpen(false)}>
+                <Link to="/admin-login" onClick={() => setOpen(false)}>
                   <Button variant="outline" className="w-full font-medium">Log In</Button>
                 </Link>
-                <Link to="/saas-login?mode=signup" onClick={() => setOpen(false)}>
+                <Link to="/admin-login" onClick={() => setOpen(false)}>
                   <Button className="w-full gradient-primary text-primary-foreground font-medium shadow-colored">Start Free Trial</Button>
                 </Link>
               </div>
