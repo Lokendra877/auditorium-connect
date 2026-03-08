@@ -213,6 +213,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       pc.ontrack = (e) => {
         const audio = helpersRef.current.createAudioElement();
         audio.srcObject = e.streams[0];
+        // Connect through EQ pipeline if not already connected
+        if (!sourceNodeRef.current) {
+          connectAudioPipeline(audio);
+        }
         audio.play().catch(() => {});
         safeSet(setIsReceiving, true);
       };
