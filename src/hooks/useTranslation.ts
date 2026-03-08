@@ -150,7 +150,7 @@ export function useTranscriptListener(
       setTranslatedSubtitle(translated);
 
       // Text-to-speech
-      if ('speechSynthesis' in window && translated) {
+      if (ttsEnabledRef.current && 'speechSynthesis' in window && translated) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(translated);
         utterance.lang = getLanguageCode(lang);
