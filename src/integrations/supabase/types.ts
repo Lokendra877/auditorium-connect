@@ -14,7 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      sessions: {
+        Row: {
+          admin_code: string
+          created_at: string
+          current_speaker_id: string | null
+          id: string
+          is_active: boolean
+          speaker_started_at: string | null
+          speaking_time_seconds: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_code?: string
+          created_at?: string
+          current_speaker_id?: string | null
+          id?: string
+          is_active?: boolean
+          speaker_started_at?: string | null
+          speaking_time_seconds?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_code?: string
+          created_at?: string
+          current_speaker_id?: string | null
+          id?: string
+          is_active?: boolean
+          speaker_started_at?: string | null
+          speaking_time_seconds?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      speaker_queue: {
+        Row: {
+          device_id: string
+          finished_speaking_at: string | null
+          id: string
+          position: number
+          requested_at: string
+          session_id: string
+          started_speaking_at: string | null
+          status: string
+          user_name: string
+        }
+        Insert: {
+          device_id: string
+          finished_speaking_at?: string | null
+          id?: string
+          position: number
+          requested_at?: string
+          session_id: string
+          started_speaking_at?: string | null
+          status?: string
+          user_name: string
+        }
+        Update: {
+          device_id?: string
+          finished_speaking_at?: string | null
+          id?: string
+          position?: number
+          requested_at?: string
+          session_id?: string
+          started_speaking_at?: string | null
+          status?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "speaker_queue_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
