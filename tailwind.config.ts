@@ -47,11 +47,12 @@ export default {
   				DEFAULT: 'hsl(var(--warning))',
   				foreground: 'hsl(var(--warning-foreground))'
   			},
-  			'anime-cyan': 'hsl(var(--anime-cyan))',
-  			'anime-pink': 'hsl(var(--anime-pink))',
-  			'anime-yellow': 'hsl(var(--anime-yellow))',
-  			'anime-purple': 'hsl(var(--anime-purple))',
-  			'anime-red': 'hsl(var(--anime-red))',
+  			'vibrant-orange': 'hsl(var(--vibrant-orange))',
+  			'vibrant-blue': 'hsl(var(--vibrant-blue))',
+  			'vibrant-teal': 'hsl(var(--vibrant-teal))',
+  			'vibrant-pink': 'hsl(var(--vibrant-pink))',
+  			'vibrant-purple': 'hsl(var(--vibrant-purple))',
+  			'vibrant-yellow': 'hsl(var(--vibrant-yellow))',
   			popover: {
   				DEFAULT: 'hsl(var(--popover))',
   				foreground: 'hsl(var(--popover-foreground))'
@@ -77,115 +78,39 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		fontFamily: {
-  			heading: [
-  				'Bangers',
-  				'cursive'
-  			],
-  			body: [
-  				'Inter',
-  				'sans-serif'
-  			],
-  			pixel: [
-  				'Press Start 2P',
-  				'cursive'
-  			],
-  			sans: [
-  				'Inter',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Roboto',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
-  				'sans-serif'
-  			],
-  			mono: [
-  				'Space Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
-  			],
-  			serif: [
-  				'Lora',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			]
+  			heading: ['Plus Jakarta Sans', 'sans-serif'],
+  			body: ['DM Sans', 'sans-serif'],
+  			sans: ['DM Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+  			mono: ['Space Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+  			serif: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif']
   		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			},
   			'pulse-ring': {
-  				'0%': {
-  					transform: 'scale(0.8)',
-  					opacity: '1'
-  				},
-  				'100%': {
-  					transform: 'scale(2)',
-  					opacity: '0'
-  				}
+  				'0%': { transform: 'scale(0.8)', opacity: '1' },
+  				'100%': { transform: 'scale(2)', opacity: '0' }
   			},
   			'slide-up': {
-  				from: {
-  					transform: 'translateY(8px)',
-  					opacity: '0'
-  				},
-  				to: {
-  					transform: 'translateY(0)',
-  					opacity: '1'
-  				}
+  				from: { transform: 'translateY(8px)', opacity: '0' },
+  				to: { transform: 'translateY(0)', opacity: '1' }
   			},
   			'bounce-in': {
-  				'0%': {
-  					transform: 'scale(0.3)',
-  					opacity: '0'
-  				},
-  				'50%': {
-  					transform: 'scale(1.05)'
-  				},
-  				'70%': {
-  					transform: 'scale(0.9)'
-  				},
-  				'100%': {
-  					transform: 'scale(1)',
-  					opacity: '1'
-  				}
+  				'0%': { transform: 'scale(0.3)', opacity: '0' },
+  				'50%': { transform: 'scale(1.05)' },
+  				'70%': { transform: 'scale(0.9)' },
+  				'100%': { transform: 'scale(1)', opacity: '1' }
   			},
   			shake: {
-  				'0%, 100%': {
-  					transform: 'translateX(0)'
-  				},
-  				'10%, 30%, 50%, 70%, 90%': {
-  					transform: 'translateX(-4px)'
-  				},
-  				'20%, 40%, 60%, 80%': {
-  					transform: 'translateX(4px)'
-  				}
+  				'0%, 100%': { transform: 'translateX(0)' },
+  				'10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+  				'20%, 40%, 60%, 80%': { transform: 'translateX(4px)' }
   			}
   		},
   		animation: {
@@ -204,11 +129,8 @@ export default {
   			lg: 'var(--shadow-lg)',
   			xl: 'var(--shadow-xl)',
   			'2xl': 'var(--shadow-2xl)',
-  			anime: 'var(--shadow-anime)',
-  			'anime-cyan': 'var(--shadow-anime-cyan)',
   			glow: 'var(--shadow-glow)',
-  			'glow-cyan': 'var(--shadow-glow-cyan)',
-  			'glow-yellow': 'var(--shadow-glow-yellow)'
+  			colored: 'var(--shadow-colored)'
   		}
   	}
   },
