@@ -107,7 +107,7 @@ export default function SessionPage() {
   };
 
   const handleRequestSpeak = async () => {
-    await requestToSpeak(userName);
+    await requestToSpeak(userName, userEmail);
   };
 
   const handleStopSpeaking = async () => {

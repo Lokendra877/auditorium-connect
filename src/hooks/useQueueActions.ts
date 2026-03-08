@@ -9,7 +9,7 @@ export function useQueueActions(sessionId: string | undefined) {
   const deviceId = getDeviceId();
   const lastRequestRef = useRef<number>(0);
 
-  const requestToSpeak = useCallback(async (userName: string) => {
+  const requestToSpeak = useCallback(async (userName: string, userEmail?: string) => {
     if (!sessionId) return;
 
     // Client-side rate limit
@@ -69,10 +69,11 @@ export function useQueueActions(sessionId: string | undefined) {
       .insert({
         session_id: sessionId,
         user_name: userName,
+        user_email: userEmail || null,
         device_id: deviceId,
         position: nextPosition,
         status: 'waiting',
-      });
+      } as any);
 
     if (error) {
       toast.error('Failed to join queue');
