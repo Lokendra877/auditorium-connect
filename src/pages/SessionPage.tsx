@@ -18,7 +18,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail } from 'lucide-react';
+import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail, Settings, Trash2 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 function getCookie(name: string): string | null {
   const nameEQ = name + '=';
@@ -126,6 +127,16 @@ export default function SessionPage() {
     setHasJoined(false);
   };
 
+  const handleClearAllCookies = () => {
+    document.cookie.split(';').forEach((cookie) => {
+      const name = cookie.split('=')[0].trim();
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+    setUserName('');
+    setUserEmail('');
+    setHasJoined(false);
+  };
+
   if (!hasJoined) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-hero px-4 relative overflow-hidden">
@@ -190,7 +201,22 @@ export default function SessionPage() {
             <h1 className="font-heading text-2xl font-bold truncate">{session.title}</h1>
             <p className="text-sm text-muted-foreground">Welcome, {userName}</p>
           </div>
-          <UserNotificationBell sessionId={sessionId!} />
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleClearAllCookies} className="text-destructive focus:text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Reset All Cookies
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <UserNotificationBell sessionId={sessionId!} />
+          </div>
         </motion.div>
 
         {/* Audio Status */}
