@@ -50,6 +50,39 @@ export default function AdminDashboard() {
   const [recordings, setRecordings] = useState<any[]>([]);
   const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
 
+  const prevSpeakerRef = useRef<string | null>(null);
+
+  // Fetch recordings for export
+  useEffect(() => {
+    if (!sessionId) return;
+    const fetch = async () => {
+      const { data } = await supabase
+        .from('audio_recordings')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('recorded_at', { ascending: false });
+      if (data) setRecordings(data);
+    };
+    fetch();
+    const channel = supabase
+      .channel(`export-recordings-${sessionId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audio_recordings', filter: `session_id=eq.${sessionId}` }, () => fetch())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [sessionId]);
+
+  const handleExportCSV = () => {
+    if (!session) return;
+    exportAllCSV(analyticsData, recordings, session);
+    toast.success('CSV exported');
+  };
+
+  const handleExportPDF = () => {
+    if (!session) return;
+    exportSessionPDF(analyticsData, recordings, session);
+    toast.success('PDF report exported');
+  };
+
   // Auto-record when a speaker starts, auto-stop when they finish
   const currentSpeaker = queue.find(e => e.status === 'speaking');
   const waitingCount = queue.filter(e => e.status === 'waiting').length;
