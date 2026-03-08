@@ -14,6 +14,7 @@ interface Poll {
   options: string[];
   is_active: boolean;
   is_multi_select: boolean;
+  closes_at: string | null;
   created_at: string;
 }
 
