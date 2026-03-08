@@ -16,8 +16,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Power, PlayCircle, Users, Clock, Volume2 } from 'lucide-react';
+import { Loader2, Power, PlayCircle, Users, Clock, Volume2, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
@@ -25,6 +32,7 @@ import { RecordingsList } from '@/components/RecordingsList';
 import { LiveSubtitles } from '@/components/LiveSubtitles';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useTranscriptListener } from '@/hooks/useTranslation';
+import { exportAllCSV, exportSessionPDF } from '@/lib/exportData';
 
 export default function AdminDashboard() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -39,8 +47,41 @@ export default function AdminDashboard() {
   const { isReceiving, remoteAudioRef, remoteStreamRef, setEQ } = useWebRTC(sessionId, false);
   const analyticsData = useSessionAnalytics(sessionId, session?.created_at);
   const { isRecording, startRecording, stopRecording } = useAudioRecorder(sessionId);
-  const prevSpeakerRef = useRef<string | null>(null);
+  const [recordings, setRecordings] = useState<any[]>([]);
   const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
+
+  const prevSpeakerRef = useRef<string | null>(null);
+
+  // Fetch recordings for export
+  useEffect(() => {
+    if (!sessionId) return;
+    const fetch = async () => {
+      const { data } = await supabase
+        .from('audio_recordings')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('recorded_at', { ascending: false });
+      if (data) setRecordings(data);
+    };
+    fetch();
+    const channel = supabase
+      .channel(`export-recordings-${sessionId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audio_recordings', filter: `session_id=eq.${sessionId}` }, () => fetch())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [sessionId]);
+
+  const handleExportCSV = () => {
+    if (!session) return;
+    exportAllCSV(analyticsData, recordings, session);
+    toast.success('CSV exported');
+  };
+
+  const handleExportPDF = () => {
+    if (!session) return;
+    exportSessionPDF(analyticsData, recordings, session);
+    toast.success('PDF report exported');
+  };
 
   // Auto-record when a speaker starts, auto-stop when they finish
   const currentSpeaker = queue.find(e => e.status === 'speaking');
@@ -117,9 +158,29 @@ export default function AdminDashboard() {
             <h1 className="font-heading text-2xl font-bold">{session.title}</h1>
             <p className="text-sm text-muted-foreground">Admin Dashboard</p>
           </div>
-          <Button variant="destructive" size="sm" onClick={endSession}>
-            <Power className="w-4 h-4 mr-1" /> End Session
-          </Button>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="w-4 h-4 mr-1" /> Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleExportCSV}>
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export as CSV
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleExportPDF}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="destructive" size="sm" onClick={endSession}>
+              <Power className="w-4 h-4 mr-1" /> End Session
+            </Button>
+          </div>
         </motion.div>
 
         <div className="grid lg:grid-cols-4 gap-6">
