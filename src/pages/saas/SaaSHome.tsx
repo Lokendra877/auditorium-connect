@@ -169,8 +169,8 @@ export default function SaaSHome() {
                ))}
              </div>
            </motion.div>
-
-      {/* Problem Section */}
+         </div>
+       </section>
       <section className="py-20 bg-card/50">
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="text-center mb-14">
