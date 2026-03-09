@@ -42,7 +42,7 @@ function setCookie(name: string, value: string, days: number = 365) {
 export default function SessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { session, queue, loading } = useSession(sessionId);
-  const { requestToSpeak, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, moderatorSpeakNow, deviceId } = useQueueActions(sessionId);
+  const { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, moderatorSpeakNow, deviceId } = useQueueActions(sessionId);
 
   const savedName = getCookie('smartmic_user_name') || '';
   const savedEmail = getCookie('smartmic_user_email') || '';
