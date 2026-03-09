@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail, Settings, Trash2 } from 'lucide-react';
+import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail, Settings, Trash2, Shield, PlayCircle, SkipForward, X as XIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 function getCookie(name: string): string | null {
