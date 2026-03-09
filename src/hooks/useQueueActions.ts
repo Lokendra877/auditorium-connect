@@ -151,5 +151,17 @@ export function useQueueActions(sessionId: string | undefined) {
     }
   }, [sessionId, grantMic]);
 
-  return { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, deviceId };
+  const promoteModerator = useCallback(async (queueEntryId: string) => {
+    const { error } = await supabase
+      .from('speaker_queue')
+      .update({ is_moderator: true } as any)
+      .eq('id', queueEntryId);
+    if (error) {
+      toast.error('Failed to promote');
+    } else {
+      toast.success('Promoted to moderator');
+    }
+  }, []);
+
+  return { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, promoteModerator, deviceId };
 }

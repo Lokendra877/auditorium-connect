@@ -317,6 +317,7 @@ export type Database = {
           device_id: string
           finished_speaking_at: string | null
           id: string
+          is_moderator: boolean
           position: number
           requested_at: string
           session_id: string
@@ -329,6 +330,7 @@ export type Database = {
           device_id: string
           finished_speaking_at?: string | null
           id?: string
+          is_moderator?: boolean
           position: number
           requested_at?: string
           session_id: string
@@ -341,6 +343,7 @@ export type Database = {
           device_id?: string
           finished_speaking_at?: string | null
           id?: string
+          is_moderator?: boolean
           position?: number
           requested_at?: string
           session_id?: string

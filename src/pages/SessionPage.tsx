@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail, Settings, Trash2 } from 'lucide-react';
+import { Hand, Loader2, Mic, Mic2, MessageCircle, BarChart3, StopCircle, Mail, Settings, Trash2, Shield, PlayCircle, SkipForward, X as XIcon } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 function getCookie(name: string): string | null {
@@ -42,7 +42,7 @@ function setCookie(name: string, value: string, days: number = 365) {
 export default function SessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { session, queue, loading } = useSession(sessionId);
-  const { requestToSpeak, revokeMic, deviceId } = useQueueActions(sessionId);
+  const { requestToSpeak, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, deviceId } = useQueueActions(sessionId);
 
   const savedName = getCookie('smartmic_user_name') || '';
   const savedEmail = getCookie('smartmic_user_email') || '';
@@ -55,6 +55,7 @@ export default function SessionPage() {
   const [ttsEnabled, setTtsEnabled] = useState(true);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
+  const amIModerator = (myEntry as any)?.is_moderator === true;
   const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
@@ -274,8 +275,37 @@ export default function SessionPage() {
                 <SpeakerTimer totalSeconds={session.speaking_time_seconds} startedAt={session.speaker_started_at} />
               )}
             </div>
+            {/* Moderator controls for current speaker */}
+            {amIModerator && currentSpeaker && (
+              <div className="flex gap-2 mt-3">
+                <Button size="sm" className="flex-1 bg-warning text-warning-foreground hover:bg-warning/90 font-medium" onClick={() => skipSpeaker(currentSpeaker.id).then(() => setTimeout(grantNextSpeaker, 500))}>
+                  <SkipForward className="w-4 h-4 mr-1" /> Skip
+                </Button>
+                <Button variant="destructive" size="sm" className="flex-1 font-medium" onClick={() => revokeMic(currentSpeaker.id)}>
+                  <XIcon className="w-4 h-4 mr-1" /> Revoke
+                </Button>
+              </div>
+            )}
+            {/* Moderator grant next button */}
+            {amIModerator && !currentSpeaker && waitingQueue.length > 0 && (
+              <Button className="w-full mt-3 bg-success text-success-foreground hover:bg-success/90 font-medium" onClick={grantNextSpeaker}>
+                <PlayCircle className="w-4 h-4 mr-1" /> Grant Next ({waitingQueue.length})
+              </Button>
+            )}
           </CardContent>
         </Card>
+
+        {/* Moderator badge */}
+        {amIModerator && (
+          <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
+            <Card className="bg-accent/10 border-2 border-accent/30 shadow-sm">
+              <CardContent className="p-3 text-center flex items-center justify-center gap-2">
+                <Shield className="w-5 h-5 text-accent" />
+                <p className="font-heading text-sm font-bold text-accent">You are a Moderator</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* My Status */}
         {myEntry && (
@@ -331,7 +361,13 @@ export default function SessionPage() {
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
               Speaker Queue ({queue.length})
             </h2>
-            <QueueList queue={queue} currentDeviceId={deviceId} />
+            <QueueList
+              queue={queue}
+              currentDeviceId={deviceId}
+              isModerator={amIModerator}
+              onSkip={amIModerator ? (id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500)) : undefined}
+              onRemove={amIModerator ? removeFromQueue : undefined}
+            />
           </TabsContent>
 
           <TabsContent value="questions" className="mt-4">
