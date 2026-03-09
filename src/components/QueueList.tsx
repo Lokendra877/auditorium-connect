@@ -1,6 +1,6 @@
 import type { Tables } from '@/integrations/supabase/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Clock, User, X, SkipForward, Mail, Shield } from 'lucide-react';
+import { Mic, Clock, User, X, SkipForward, Mail, Shield, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type QueueEntry = Tables<'speaker_queue'>;
