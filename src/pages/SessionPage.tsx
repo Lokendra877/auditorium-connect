@@ -42,7 +42,7 @@ function setCookie(name: string, value: string, days: number = 365) {
 export default function SessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { session, queue, loading } = useSession(sessionId);
-  const { requestToSpeak, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, deviceId } = useQueueActions(sessionId);
+  const { requestToSpeak, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, moderatorSpeakNow, deviceId } = useQueueActions(sessionId);
 
   const savedName = getCookie('smartmic_user_name') || '';
   const savedEmail = getCookie('smartmic_user_email') || '';
@@ -295,13 +295,24 @@ export default function SessionPage() {
           </CardContent>
         </Card>
 
-        {/* Moderator badge */}
+        {/* Moderator badge + Speak Now */}
         {amIModerator && (
           <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
             <Card className="bg-accent/10 border-2 border-accent/30 shadow-sm">
-              <CardContent className="p-3 text-center flex items-center justify-center gap-2">
-                <Shield className="w-5 h-5 text-accent" />
-                <p className="font-heading text-sm font-bold text-accent">You are a Moderator</p>
+              <CardContent className="p-3 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-accent" />
+                  <p className="font-heading text-sm font-bold text-accent">You are a Moderator</p>
+                </div>
+                {!amISpeaking && (
+                  <Button
+                    size="sm"
+                    className="gradient-primary text-primary-foreground font-heading font-semibold shadow-colored hover:opacity-90"
+                    onClick={() => moderatorSpeakNow(userName, userEmail)}
+                  >
+                    <Mic className="w-4 h-4 mr-1" /> Speak Now
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </motion.div>
