@@ -17,7 +17,7 @@ interface QueueListProps {
   onGrantMic?: (id: string) => void;
 }
 
-export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext }: QueueListProps) {
+export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext, onGrantMic }: QueueListProps) {
   const showControls = isAdmin || isModerator;
 
   if (queue.length === 0) {
