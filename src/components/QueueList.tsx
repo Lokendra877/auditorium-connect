@@ -87,6 +87,11 @@ export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip
                       <Shield className="w-4 h-4" />
                     </Button>
                   )}
+                  {!isSpeaking && entry.status === 'waiting' && onGrantMic && (
+                    <Button variant="ghost" size="icon" onClick={() => onGrantMic(entry.id)} className="h-8 w-8 text-success hover:bg-success/10" title="Grant Mic">
+                      <PlayCircle className="w-4 h-4" />
+                    </Button>
+                  )}
                   {isSpeaking && onSkip && (
                     <Button variant="ghost" size="icon" onClick={() => onSkip(entry.id)} className="h-8 w-8 text-warning hover:bg-warning/10">
                       <SkipForward className="w-4 h-4" />
