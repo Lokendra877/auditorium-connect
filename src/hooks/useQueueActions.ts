@@ -163,5 +163,77 @@ export function useQueueActions(sessionId: string | undefined) {
     }
   }, []);
 
-  return { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, promoteModerator, deviceId };
+  const moderatorSpeakNow = useCallback(async (userName: string, userEmail?: string) => {
+    if (!sessionId) return;
+
+    // If moderator already has an active entry that's speaking, ignore
+    const { data: existing } = await supabase
+      .from('speaker_queue')
+      .select('id, status')
+      .eq('session_id', sessionId)
+      .eq('device_id', deviceId)
+      .in('status', ['speaking']);
+
+    if (existing && existing.length > 0) {
+      toast.error('You are already speaking');
+      return;
+    }
+
+    // If moderator is waiting in queue, promote that entry to speaking
+    const { data: waitingEntry } = await supabase
+      .from('speaker_queue')
+      .select('id')
+      .eq('session_id', sessionId)
+      .eq('device_id', deviceId)
+      .eq('status', 'waiting')
+      .limit(1);
+
+    if (waitingEntry && waitingEntry.length > 0) {
+      await grantMic(waitingEntry[0].id);
+      toast.success('You are now speaking!');
+      return;
+    }
+
+    // Otherwise insert a new entry directly as speaking
+    const { data: maxPos } = await supabase
+      .from('speaker_queue')
+      .select('position')
+      .eq('session_id', sessionId)
+      .order('position', { ascending: false })
+      .limit(1);
+
+    const nextPosition = (maxPos && maxPos.length > 0) ? maxPos[0].position + 1 : 1;
+
+    const { data: inserted, error } = await supabase
+      .from('speaker_queue')
+      .insert({
+        session_id: sessionId,
+        user_name: userName,
+        user_email: userEmail || null,
+        device_id: deviceId,
+        position: nextPosition,
+        status: 'speaking',
+        is_moderator: true,
+        started_speaking_at: new Date().toISOString(),
+      } as any)
+      .select()
+      .single();
+
+    if (error) {
+      toast.error('Failed to start speaking');
+      return;
+    }
+
+    await supabase
+      .from('sessions')
+      .update({
+        current_speaker_id: inserted.id,
+        speaker_started_at: new Date().toISOString(),
+      })
+      .eq('id', sessionId);
+
+    toast.success('You are now speaking!');
+  }, [sessionId, deviceId, grantMic]);
+
+  return { requestToSpeak, grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, promoteModerator, moderatorSpeakNow, deviceId };
 }
