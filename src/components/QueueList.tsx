@@ -1,6 +1,6 @@
 import type { Tables } from '@/integrations/supabase/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Clock, User, X, SkipForward, Mail } from 'lucide-react';
+import { Mic, Clock, User, X, SkipForward, Mail, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type QueueEntry = Tables<'speaker_queue'>;
@@ -9,11 +9,16 @@ interface QueueListProps {
   queue: QueueEntry[];
   currentDeviceId?: string;
   isAdmin?: boolean;
+  isModerator?: boolean;
   onSkip?: (id: string) => void;
   onRemove?: (id: string) => void;
+  onPromoteModerator?: (id: string) => void;
+  onGrantNext?: () => void;
 }
 
-export function QueueList({ queue, currentDeviceId, isAdmin, onSkip, onRemove }: QueueListProps) {
+export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext }: QueueListProps) {
+  const showControls = isAdmin || isModerator;
+
   if (queue.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
@@ -29,6 +34,7 @@ export function QueueList({ queue, currentDeviceId, isAdmin, onSkip, onRemove }:
         {queue.map((entry, index) => {
           const isSpeaking = entry.status === 'speaking';
           const isMe = entry.device_id === currentDeviceId;
+          const entryIsModerator = (entry as any).is_moderator === true;
 
           return (
             <motion.div
@@ -55,11 +61,16 @@ export function QueueList({ queue, currentDeviceId, isAdmin, onSkip, onRemove }:
                 <p className="font-medium text-sm truncate">
                   {entry.user_name}
                   {isMe && <span className="ml-1 text-xs text-primary">(You)</span>}
+                  {entryIsModerator && (
+                    <span className="ml-1 text-xs text-accent inline-flex items-center gap-0.5">
+                      <Shield className="w-3 h-3" /> Moderator
+                    </span>
+                  )}
                 </p>
-                {isAdmin && (entry as any).user_email && (
+                {isAdmin && entry.user_email && (
                   <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
                     <Mail className="w-3 h-3 shrink-0" />
-                    {(entry as any).user_email}
+                    {entry.user_email}
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -68,8 +79,13 @@ export function QueueList({ queue, currentDeviceId, isAdmin, onSkip, onRemove }:
                 </p>
               </div>
 
-              {isAdmin && (
+              {showControls && (
                 <div className="flex gap-1">
+                  {isAdmin && !entryIsModerator && onPromoteModerator && (
+                    <Button variant="ghost" size="icon" onClick={() => onPromoteModerator(entry.id)} className="h-8 w-8 text-accent hover:bg-accent/10" title="Promote to Moderator">
+                      <Shield className="w-4 h-4" />
+                    </Button>
+                  )}
                   {isSpeaking && onSkip && (
                     <Button variant="ghost" size="icon" onClick={() => onSkip(entry.id)} className="h-8 w-8 text-warning hover:bg-warning/10">
                       <SkipForward className="w-4 h-4" />
