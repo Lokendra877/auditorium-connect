@@ -55,6 +55,7 @@ export default function SessionPage() {
   const [ttsEnabled, setTtsEnabled] = useState(true);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
+  const amIModerator = (myEntry as any)?.is_moderator === true;
   const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
