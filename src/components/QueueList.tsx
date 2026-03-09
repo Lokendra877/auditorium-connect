@@ -14,6 +14,7 @@ interface QueueListProps {
   onRemove?: (id: string) => void;
   onPromoteModerator?: (id: string) => void;
   onGrantNext?: () => void;
+  onGrantMic?: (id: string) => void;
 }
 
 export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext }: QueueListProps) {
