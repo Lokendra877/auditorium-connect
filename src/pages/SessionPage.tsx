@@ -378,6 +378,7 @@ export default function SessionPage() {
               isModerator={amIModerator}
               onSkip={amIModerator ? (id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500)) : undefined}
               onRemove={amIModerator ? removeFromQueue : undefined}
+              onGrantMic={amIModerator ? grantMic : undefined}
             />
           </TabsContent>
 
