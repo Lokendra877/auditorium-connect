@@ -229,7 +229,7 @@ export default function AdminDashboard() {
               <TabsContent value="queue" className="mt-3">
                 <Card className="shadow-sm border">
                   <CardHeader className="pb-2"><CardTitle className="font-heading text-lg">Speaker Queue</CardTitle></CardHeader>
-                  <CardContent><QueueList queue={queue} isAdmin onSkip={(id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500))} onRemove={removeFromQueue} /></CardContent>
+                  <CardContent><QueueList queue={queue} isAdmin onSkip={(id) => skipSpeaker(id).then(() => setTimeout(grantNextSpeaker, 500))} onRemove={removeFromQueue} onPromoteModerator={promoteModerator} /></CardContent>
                 </Card>
               </TabsContent>
               <TabsContent value="questions" className="mt-3">
