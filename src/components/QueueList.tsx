@@ -1,6 +1,6 @@
 import type { Tables } from '@/integrations/supabase/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Clock, User, X, SkipForward, Mail, Shield } from 'lucide-react';
+import { Mic, Clock, User, X, SkipForward, Mail, Shield, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type QueueEntry = Tables<'speaker_queue'>;
@@ -14,9 +14,10 @@ interface QueueListProps {
   onRemove?: (id: string) => void;
   onPromoteModerator?: (id: string) => void;
   onGrantNext?: () => void;
+  onGrantMic?: (id: string) => void;
 }
 
-export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext }: QueueListProps) {
+export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip, onRemove, onPromoteModerator, onGrantNext, onGrantMic }: QueueListProps) {
   const showControls = isAdmin || isModerator;
 
   if (queue.length === 0) {
@@ -84,6 +85,11 @@ export function QueueList({ queue, currentDeviceId, isAdmin, isModerator, onSkip
                   {isAdmin && !entryIsModerator && onPromoteModerator && (
                     <Button variant="ghost" size="icon" onClick={() => onPromoteModerator(entry.id)} className="h-8 w-8 text-accent hover:bg-accent/10" title="Promote to Moderator">
                       <Shield className="w-4 h-4" />
+                    </Button>
+                  )}
+                  {!isSpeaking && entry.status === 'waiting' && onGrantMic && (
+                    <Button variant="ghost" size="icon" onClick={() => onGrantMic(entry.id)} className="h-8 w-8 text-success hover:bg-success/10" title="Grant Mic">
+                      <PlayCircle className="w-4 h-4" />
                     </Button>
                   )}
                   {isSpeaking && onSkip && (

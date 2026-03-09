@@ -104,10 +104,24 @@ export function useQueueActions(sessionId: string | undefined) {
   const revokeMic = useCallback(async (queueEntryId: string) => {
     if (!sessionId) return;
 
-    await supabase
+    // Check if this entry is a moderator — if so, keep them in queue as waiting
+    const { data: entry } = await supabase
       .from('speaker_queue')
-      .update({ status: 'done', finished_speaking_at: new Date().toISOString() })
-      .eq('id', queueEntryId);
+      .select('is_moderator')
+      .eq('id', queueEntryId)
+      .single();
+
+    if (entry?.is_moderator) {
+      await supabase
+        .from('speaker_queue')
+        .update({ status: 'waiting', started_speaking_at: null, finished_speaking_at: null } as any)
+        .eq('id', queueEntryId);
+    } else {
+      await supabase
+        .from('speaker_queue')
+        .update({ status: 'done', finished_speaking_at: new Date().toISOString() })
+        .eq('id', queueEntryId);
+    }
 
     await supabase
       .from('sessions')
