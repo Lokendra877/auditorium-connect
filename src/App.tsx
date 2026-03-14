@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminHome from "./pages/AdminHome";
 import AdminNotificationsPage from "./pages/AdminNotificationsPage";
+import LoadTest from "./pages/LoadTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
