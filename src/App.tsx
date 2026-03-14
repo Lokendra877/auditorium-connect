@@ -21,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import AdminHome from "./pages/AdminHome";
 import AdminNotificationsPage from "./pages/AdminNotificationsPage";
+import LoadTest from "./pages/LoadTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/admin-notifications" element={<AdminNotificationsPage />} />
           <Route path="/session/:sessionId" element={<SessionPage />} />
           <Route path="/admin/:sessionId" element={<AdminDashboard />} />
+          <Route path="/load-test" element={<LoadTest />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
