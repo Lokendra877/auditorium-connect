@@ -50,6 +50,7 @@ const App = () => (
           <Route path="/admin-notifications" element={<AdminNotificationsPage />} />
           <Route path="/session/:sessionId" element={<SessionPage />} />
           <Route path="/admin/:sessionId" element={<AdminDashboard />} />
+          <Route path="/load-test" element={<LoadTest />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
