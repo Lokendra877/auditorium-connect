@@ -22,11 +22,10 @@ export default function LandingPage() {
       return;
     }
     setCreating(true);
-    const { data, error } = await supabase
-      .from('sessions')
-      .insert({ title: title.trim(), speaking_time_seconds: speakingTime })
-      .select()
-      .single();
+    const { data, error } = await supabase.rpc('create_quick_session', {
+      p_title: title.trim(),
+      p_speaking_time: speakingTime,
+    });
 
     if (error || !data) {
       toast.error('Failed to create session');
@@ -34,8 +33,9 @@ export default function LandingPage() {
       return;
     }
 
+    const session = data as { id: string; admin_code: string; title: string };
     toast.success('Session created!');
-    navigate(`/admin/${data.id}?code=${data.admin_code}`);
+    navigate(`/admin/${session.id}?code=${session.admin_code}`);
   };
 
   const joinSession = () => {
