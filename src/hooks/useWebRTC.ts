@@ -4,29 +4,35 @@ import { getDeviceId } from '@/lib/device-id';
 
 const ICE_SERVERS: RTCConfiguration = {
   iceServers: [
+    // Google STUN servers (free, highly reliable)
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+    // Open Relay TURN servers (free, community-provided)
     {
-      urls: 'turn:a.relay.metered.ca:80',
-      username: 'e8dd65b92f070a5e580dfc77',
-      credential: '5yMjgSlhMWD5zyFz',
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turn:a.relay.metered.ca:80?transport=tcp',
-      username: 'e8dd65b92f070a5e580dfc77',
-      credential: '5yMjgSlhMWD5zyFz',
+      urls: 'turn:openrelay.metered.ca:80?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turn:a.relay.metered.ca:443',
-      username: 'e8dd65b92f070a5e580dfc77',
-      credential: '5yMjgSlhMWD5zyFz',
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
     {
-      urls: 'turns:a.relay.metered.ca:443?transport=tcp',
-      username: 'e8dd65b92f070a5e580dfc77',
-      credential: '5yMjgSlhMWD5zyFz',
+      urls: 'turns:openrelay.metered.ca:443?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject',
     },
   ],
+  iceCandidatePoolSize: 10,
 };
 
 type SignalMessage = {
