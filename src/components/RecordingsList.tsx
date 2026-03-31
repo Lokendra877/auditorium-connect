@@ -30,8 +30,15 @@ export function RecordingsList({ sessionId }: { sessionId: string }) {
   }, [sessionId]);
 
   const handleDownload = async (recording: Recording) => {
-    const { data } = supabase.storage.from('audio-recordings').getPublicUrl(recording.file_path);
-    if (data?.publicUrl) { const a = document.createElement('a'); a.href = data.publicUrl; a.download = `${recording.speaker_name}_${new Date(recording.recorded_at).toLocaleTimeString()}.webm`; a.click(); }
+    const { data, error } = await supabase.storage.from('audio-recordings').createSignedUrl(recording.file_path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error('Failed to generate download link');
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = data.signedUrl;
+    a.download = `${recording.speaker_name}_${new Date(recording.recorded_at).toLocaleTimeString()}.webm`;
+    a.click();
   };
 
   const handleDelete = async (recording: Recording) => {

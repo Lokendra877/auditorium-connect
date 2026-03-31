@@ -408,7 +408,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_quick_session: {
+        Args: { p_speaking_time?: number; p_title: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

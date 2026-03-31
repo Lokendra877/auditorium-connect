@@ -49,7 +49,7 @@ export default function LoadTest() {
     let start = performance.now();
     const { error: sessionErr } = await supabase
       .from('sessions')
-      .select('*')
+      .select('id, title, is_active, speaking_time_seconds, current_speaker_id, speaker_started_at')
       .eq('id', sessionId)
       .single();
     metrics.push({
