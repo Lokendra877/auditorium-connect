@@ -458,16 +458,23 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   useEffect(() => {
     if (isSpeaking) {
       const settings = enhancementsRef.current;
-      navigator.mediaDevices.getUserMedia({
-        audio: {
-          noiseSuppression: settings.noiseSuppression,
-          echoCancellation: settings.echoCancellation,
-          autoGainControl: settings.autoGainControl,
-          // Optimize for speech
-          channelCount: 1,
-          sampleRate: 48000,
-        },
-      })
+      const tryGetMic = async (): Promise<MediaStream> => {
+        // Try with full constraints first, fall back to basic audio
+        try {
+          return await navigator.mediaDevices.getUserMedia({
+            audio: {
+              noiseSuppression: settings.noiseSuppression,
+              echoCancellation: settings.echoCancellation,
+              autoGainControl: settings.autoGainControl,
+              channelCount: 1,
+            },
+          });
+        } catch {
+          console.warn('WebRTC: Full constraints failed, trying basic audio');
+          return await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+      };
+      tryGetMic()
         .then((stream) => {
           if (!mountedRef.current) {
             stream.getTracks().forEach(t => t.stop());
