@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
-export type Session = Omit<Tables<'sessions'>, 'admin_code'> & { admin_code?: string };
+export type Session = Omit<Tables<'sessions'>, 'admin_code'>;
 type QueueEntry = Tables<'speaker_queue'>;
 
 export function useSession(sessionId: string | undefined) {
