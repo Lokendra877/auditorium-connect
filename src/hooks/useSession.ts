@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
-type Session = Tables<'sessions'>;
+export type Session = Omit<Tables<'sessions'>, 'admin_code'>;
 type QueueEntry = Tables<'speaker_queue'>;
 
 export function useSession(sessionId: string | undefined) {
@@ -14,7 +14,7 @@ export function useSession(sessionId: string | undefined) {
     if (!sessionId) return;
     const { data } = await supabase
       .from('sessions')
-      .select('*')
+      .select('id, title, is_active, created_at, updated_at, speaking_time_seconds, current_speaker_id, speaker_started_at, user_id')
       .eq('id', sessionId)
       .single();
     if (data) setSession(data);

@@ -43,6 +43,7 @@ export default function AdminDashboard() {
   const [volume, setVolume] = useState(100);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [adminVerified, setAdminVerified] = useState<boolean | null>(null);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, promoteModerator } = useQueueActions(sessionId);
   const { isReceiving, remoteAudioRef, remoteStreamRef, recordableStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel, analyserRef } = useWebRTC(sessionId, false);
@@ -52,6 +53,15 @@ export default function AdminDashboard() {
   const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
 
   const prevSpeakerRef = useRef<string | null>(null);
+
+  // Verify admin code server-side (authenticated users can read admin_code)
+  useEffect(() => {
+    if (!sessionId || !adminCode) { setAdminVerified(false); return; }
+    supabase.from('sessions').select('admin_code').eq('id', sessionId).single()
+      .then(({ data }) => {
+        setAdminVerified(data?.admin_code === adminCode);
+      });
+  }, [sessionId, adminCode]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -99,7 +109,7 @@ export default function AdminDashboard() {
     navigate('/');
   };
 
-  if (loading) {
+  if (loading || adminVerified === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -107,7 +117,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!session || session.admin_code !== adminCode) {
+  if (!session || !adminVerified) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-hero">
         <Card className="max-w-md shadow-lg border"><CardContent className="p-8 text-center">
