@@ -109,7 +109,7 @@ export default function AdminDashboard() {
     navigate('/');
   };
 
-  if (loading) {
+  if (loading || adminVerified === null) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!session || session.admin_code !== adminCode) {
+  if (!session || !adminVerified) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-hero">
         <Card className="max-w-md shadow-lg border"><CardContent className="p-8 text-center">
