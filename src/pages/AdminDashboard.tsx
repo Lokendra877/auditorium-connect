@@ -43,6 +43,7 @@ export default function AdminDashboard() {
   const [volume, setVolume] = useState(100);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [adminVerified, setAdminVerified] = useState<boolean | null>(null);
   const { session, queue, loading } = useSession(sessionId);
   const { grantMic, revokeMic, skipSpeaker, removeFromQueue, grantNextSpeaker, promoteModerator } = useQueueActions(sessionId);
   const { isReceiving, remoteAudioRef, remoteStreamRef, recordableStreamRef, setEQ, setVolume: setAudioVolume, enhancements, updateEnhancement, inputLevel, analyserRef } = useWebRTC(sessionId, false);
