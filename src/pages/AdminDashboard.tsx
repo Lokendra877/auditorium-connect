@@ -27,8 +27,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Power, PlayCircle, Users, Clock, Volume2, Download, FileText, FileSpreadsheet, MessageCircle, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect, useRef } from 'react';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { RecordingsList } from '@/components/RecordingsList';
 import { LiveSubtitles } from '@/components/LiveSubtitles';
