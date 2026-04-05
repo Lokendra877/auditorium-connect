@@ -61,6 +61,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
   const localStreamRef = useRef<MediaStream | null>(null);
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map());
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const channelReadyRef = useRef(false);
+  const pendingIceCandidatesRef = useRef<Map<string, RTCIceCandidateInit[]>>(new Map());
+  const pendingListenerJoinRef = useRef(false);
+  const pendingSpeakerReadyRef = useRef(false);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -253,16 +257,74 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       pc.close();
       peerConnectionsRef.current.delete(peerId);
     }
+    pendingIceCandidatesRef.current.delete(peerId);
+  };
+
+  const queueIceCandidate = (peerId: string, candidate: RTCIceCandidateInit) => {
+    const pending = pendingIceCandidatesRef.current.get(peerId) ?? [];
+    pending.push(candidate);
+    pendingIceCandidatesRef.current.set(peerId, pending);
+  };
+
+  const flushPendingIceCandidates = async (peerId: string, pc: RTCPeerConnection) => {
+    const pending = pendingIceCandidatesRef.current.get(peerId);
+    if (!pending?.length || !pc.remoteDescription) return;
+
+    pendingIceCandidatesRef.current.delete(peerId);
+
+    for (const candidate of pending) {
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch {
+        // Ignore stale/duplicate candidates
+      }
+    }
+  };
+
+  const sendSignal = (message: SignalMessage) => {
+    const channel = channelRef.current;
+    if (!channel || !channelReadyRef.current) return false;
+
+    channel.send({
+      type: 'broadcast',
+      event: 'signal',
+      payload: message,
+    });
+
+    return true;
+  };
+
+  const announceListenerJoin = () => {
+    if (isSpeakingRef.current) return;
+
+    const sent = sendSignal({ type: 'listener-join', from: deviceId });
+    pendingListenerJoinRef.current = !sent;
+  };
+
+  const announceSpeakerReady = () => {
+    if (!isSpeakingRef.current) return;
+
+    const sent = sendSignal({ type: 'speaker-ready', from: deviceId });
+    pendingSpeakerReadyRef.current = !sent;
+  };
+
+  const announceSpeakerLeft = () => {
+    pendingSpeakerReadyRef.current = false;
+    sendSignal({ type: 'speaker-left', from: deviceId });
   };
 
   const cleanupAll = () => {
     peerConnectionsRef.current.forEach((pc) => pc.close());
     peerConnectionsRef.current.clear();
+    pendingIceCandidatesRef.current.clear();
 
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
     }
+
+    remoteStreamRef.current = null;
+    recordableStreamRef.current = null;
 
     if (sourceNodeRef.current) {
       try { sourceNodeRef.current.disconnect(); } catch {}
@@ -304,16 +366,12 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       });
 
       pc.onicecandidate = (e) => {
-        if (e.candidate && channelRef.current) {
-          channelRef.current.send({
-            type: 'broadcast',
-            event: 'signal',
-            payload: {
-              type: 'ice-candidate',
-              from: deviceId,
-              to: listenerId,
-              payload: e.candidate.toJSON(),
-            } as SignalMessage,
+        if (e.candidate) {
+          sendSignal({
+            type: 'ice-candidate',
+            from: deviceId,
+            to: listenerId,
+            payload: e.candidate.toJSON(),
           });
         }
       };
@@ -357,16 +415,12 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       };
 
       pc.onicecandidate = (e) => {
-        if (e.candidate && channelRef.current) {
-          channelRef.current.send({
-            type: 'broadcast',
-            event: 'signal',
-            payload: {
-              type: 'ice-candidate',
-              from: deviceId,
-              to: speakerId,
-              payload: e.candidate.toJSON(),
-            } as SignalMessage,
+        if (e.candidate) {
+          sendSignal({
+            type: 'ice-candidate',
+            from: deviceId,
+            to: speakerId,
+            payload: e.candidate.toJSON(),
           });
         }
       };
@@ -380,13 +434,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
 
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        await flushPendingIceCandidates(speakerId, pc);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
-        channelRef.current?.send({
-          type: 'broadcast',
-          event: 'signal',
-          payload: { type: 'answer', from: deviceId, to: speakerId, payload: answer } as SignalMessage,
-        });
+        sendSignal({ type: 'answer', from: deviceId, to: speakerId, payload: answer });
       } catch (err) {
         console.warn('WebRTC: Failed to handle offer:', err);
       }
@@ -405,11 +456,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         case 'speaker-ready':
           if (!isSpeakingRef.current) {
             helpersRef.current.cleanupPeer(payload.from);
-            channelRef.current?.send({
-              type: 'broadcast',
-              event: 'signal',
-              payload: { type: 'listener-join', from: deviceId } as SignalMessage,
-            });
+            announceListenerJoin();
           }
           break;
 
@@ -422,7 +469,10 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         case 'answer': {
           const pc = peerConnectionsRef.current.get(payload.from);
           if (pc && pc.signalingState === 'have-local-offer') {
-            pc.setRemoteDescription(new RTCSessionDescription(payload.payload)).catch(() => {});
+            pc
+              .setRemoteDescription(new RTCSessionDescription(payload.payload))
+              .then(() => flushPendingIceCandidates(payload.from, pc))
+              .catch(() => {});
           }
           break;
         }
@@ -430,7 +480,13 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         case 'ice-candidate': {
           const conn = peerConnectionsRef.current.get(payload.from);
           if (conn) {
-            conn.addIceCandidate(new RTCIceCandidate(payload.payload)).catch(() => {});
+            if (conn.remoteDescription) {
+              conn.addIceCandidate(new RTCIceCandidate(payload.payload)).catch(() => {
+                queueIceCandidate(payload.from, payload.payload);
+              });
+            } else {
+              queueIceCandidate(payload.from, payload.payload);
+            }
           }
           break;
         }
@@ -445,9 +501,28 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
       }
     });
 
-    channel.subscribe();
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        channelReadyRef.current = true;
+
+        if (pendingSpeakerReadyRef.current) {
+          announceSpeakerReady();
+        }
+
+        if (pendingListenerJoinRef.current) {
+          announceListenerJoin();
+        }
+      }
+
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        channelReadyRef.current = false;
+      }
+    });
 
     return () => {
+      channelReadyRef.current = false;
+      pendingListenerJoinRef.current = false;
+      pendingSpeakerReadyRef.current = false;
       supabase.removeChannel(channel);
       channelRef.current = null;
     };
@@ -483,14 +558,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
           localStreamRef.current = stream;
           setIsStreaming(true);
           setMicError(null);
-
-          setTimeout(() => {
-            channelRef.current?.send({
-              type: 'broadcast',
-              event: 'signal',
-              payload: { type: 'speaker-ready', from: deviceId } as SignalMessage,
-            });
-          }, 500);
+          announceSpeakerReady();
         })
         .catch((err: any) => {
           if (!mountedRef.current) return;
@@ -499,11 +567,7 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
         });
     } else {
       if (localStreamRef.current) {
-        channelRef.current?.send({
-          type: 'broadcast',
-          event: 'signal',
-          payload: { type: 'speaker-left', from: deviceId } as SignalMessage,
-        });
+        announceSpeakerLeft();
       }
       helpersRef.current.cleanupAll();
     }
@@ -515,12 +579,8 @@ export function useWebRTC(sessionId: string | undefined, isSpeaking: boolean) {
     if (!sessionId || isSpeaking) return;
 
     const timeout = setTimeout(() => {
-      channelRef.current?.send({
-        type: 'broadcast',
-        event: 'signal',
-        payload: { type: 'listener-join', from: deviceId } as SignalMessage,
-      });
-    }, 1500);
+      announceListenerJoin();
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [sessionId, isSpeaking, deviceId]);
