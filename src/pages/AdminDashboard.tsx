@@ -54,6 +54,15 @@ export default function AdminDashboard() {
 
   const prevSpeakerRef = useRef<string | null>(null);
 
+  // Verify admin code server-side (authenticated users can read admin_code)
+  useEffect(() => {
+    if (!sessionId || !adminCode) { setAdminVerified(false); return; }
+    supabase.from('sessions').select('admin_code').eq('id', sessionId).single()
+      .then(({ data }) => {
+        setAdminVerified(data?.admin_code === adminCode);
+      });
+  }, [sessionId, adminCode]);
+
   useEffect(() => {
     if (!sessionId) return;
     const fetchRec = async () => {
