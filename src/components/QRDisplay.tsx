@@ -7,7 +7,11 @@ interface QRDisplayProps {
 }
 
 export function QRDisplay({ sessionId, size = 200 }: QRDisplayProps) {
-  const url = `${window.location.origin}/session/${sessionId}`;
+  const publishedOrigin = 'https://audii.lovable.app';
+  const hostname = window.location.hostname;
+  const isPreviewHost = hostname.includes('preview--') || hostname.endsWith('.lovableproject.com');
+  const baseUrl = isPreviewHost ? publishedOrigin : window.location.origin;
+  const url = new URL(`/session/${sessionId}`, baseUrl).toString();
 
   return (
     <Card className="gradient-card border-0 shadow-[var(--shadow-lg)]">
