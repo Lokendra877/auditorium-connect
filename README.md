@@ -92,4 +92,4 @@ auditorium-connect/
 
 ## 👨‍💻 Creator
 
-- **Lokendra Dubey**&**Kunal Singh** — *Founder & Lead Architect*
+- **Lokendra Dubey**&**Kunal Singh** — *Founder & Lead Architect of this project*
