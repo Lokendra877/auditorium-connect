@@ -1,73 +1,95 @@
-# Welcome to your Lovable project
+# SmartMic (QR Auditorium) 🎙️
 
-## Project info
+> **Contactless, Web-Based Interactive Microphone & Queue Management System for Auditoriums**
+> Created with 💻 and ☕ by **Kunal Singh**&**Lokendra Dubey**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## 🌟 Overview
 
-There are several ways of editing your application.
+**SmartMic** (also referred to as **QR Auditorium**) is a modern web application designed to eliminate physical microphone passing during conferences, lectures, and interactive sessions. By utilizing QR-code scanning, audience members can transform their own smartphones into controlled, high-quality wireless microphones that queue up and speak in real-time, managed seamlessly by a host.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## ✨ Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Instant QR Access**: Zero installation required. Audience members scan a dynamic QR code to join the interactive auditorium queue instantly.
+- **Smart Speaking Queue**: Automates the speaking queue fairly. The administrator can grant speaking rights, enforce time limits, and moderate participants.
+- **Microphone Management**: Visual indicator showing who has the floor, remaining speaking time, and active queues.
+- **Administrative Control Panel**: Full suite of controls to start, pause, extend, and terminate speaking sessions.
+- **Responsive Web UI**: A beautiful, premium layout crafted with glassmorphism, responsive elements, and smooth animations.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠️ Technology Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Frontend**: React + TypeScript (Vite)
+- **Styling**: Tailwind CSS + shadcn-ui + Framer Motion (for smooth micro-animations)
+- **Backend / Database**: Supabase (real-time subscriptions & RPC functions)
+- **Tooling**: Bun / Node.js & TypeScript
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Prerequisites
 
-# Step 3: Install the necessary dependencies.
-npm i
+- [Node.js](https://nodejs.org/) (v18+) or [Bun](https://bun.sh/)
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (optional, for local development)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/qr-auditorium.git
+   cd qr-auditorium/auditorium-connect
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or using Bun:
+   bun install
+   ```
+
+3. **Configure environment variables:**
+   Create a `.env` file in the root of the `auditorium-connect` directory:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Start the local development server:**
+   ```bash
+   npm run dev
+   # or:
+   bun dev
+   ```
+   Open [http://localhost:8080](http://localhost:8080) in your browser.
+
+---
+
+## 📂 Project Structure
+
+```
+auditorium-connect/
+├── public/                 # Static assets (Favicons, robots.txt)
+├── src/
+│   ├── assets/             # Brand logos & content illustrations
+│   ├── components/         # Reusable UI components & SaaS layouts
+│   ├── hooks/              # Custom React hooks
+│   ├── integrations/       # Database & API connectors (Supabase)
+│   ├── lib/                # Utility modules & helpers
+│   ├── pages/              # Page layouts & router views
+│   ├── App.tsx             # Root Application router
+│   ├── main.tsx            # App entrypoint
+│   └── index.css           # Global theme & typography
+├── tailwind.config.ts      # Design system configuration
+└── vite.config.ts          # Vite bundle configuration
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 👨‍💻 Creator
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **Lokendra Dubey**&**Kunal Singh** — *Founder & Lead Architect*
