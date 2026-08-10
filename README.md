@@ -1,4 +1,4 @@
-SmartMic (QR Auditorium) 🎙️
+SmartMic (QR Auditorium) [https://auditorium-connect-jwpfb5cf8-lokendradubey100-1049s-projects.vercel.app]🎙️
 
 >Contactless, Web-Based Interactive Microphone & Queue Management System for Auditoriums
 > Created with 💻 and ☕ by Lokendra Dubey&Kunal Singh
