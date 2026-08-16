@@ -11,7 +11,11 @@ interface TranscriptChunk {
 /* Speaker side: capture speech and broadcast it                       */
 /* ------------------------------------------------------------------ */
 
-export function useSpeechTranscription(sessionId: string | undefined, isSpeaking: boolean) {
+export function useSpeechTranscription(
+  sessionId: string | undefined,
+  isSpeaking: boolean,
+  sourceLanguage?: string | null
+) {
   const recognitionRef = useRef<any>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const activeRef = useRef(false);
