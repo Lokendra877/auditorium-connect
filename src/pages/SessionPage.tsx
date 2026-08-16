@@ -10,6 +10,7 @@ import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { VoiceSelector } from '@/components/VoiceSelector';
 import { LiveSubtitles } from '@/components/LiveSubtitles';
 import { SessionPolls } from '@/components/SessionPolls';
 import { AudienceQuestions } from '@/components/AudienceQuestions';
@@ -53,14 +54,17 @@ export default function SessionPage() {
   const [hasJoined, setHasJoined] = useState(!!savedName && !!savedEmail);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [spokenLanguage, setSpokenLanguage] = useState<string | null>(null);
+  const [voiceURI, setVoiceURI] = useState<string | null>(null);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
   const amIModerator = (myEntry as any)?.is_moderator === true;
   const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
-  useSpeechTranscription(sessionId, amISpeaking);
-  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
+  useSpeechTranscription(sessionId, amISpeaking, spokenLanguage);
+  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled, voiceURI);
+
 
   if (loading) {
     return (
@@ -254,10 +258,21 @@ export default function SessionPage() {
         {/* Audio Status */}
         <AudioStatus isSpeaker={amISpeaking} isStreaming={isStreaming} isReceiving={isReceiving} micError={micError} />
 
-        {/* Language Selector */}
-        <div className="my-3">
+        {/* Language & voice settings */}
+        <div className="my-3 space-y-2">
           <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
+          {targetLanguage && (
+            <VoiceSelector language={targetLanguage} selectedVoiceURI={voiceURI} onSelect={setVoiceURI} />
+          )}
+          <LanguageSelector
+            selectedLanguage={spokenLanguage}
+            onSelect={setSpokenLanguage}
+            activeLabel={(lang) => `I speak: ${lang}`}
+            placeholder="I speak: Auto-detect (device language)"
+            offLabel="Auto"
+          />
         </div>
+
 
         {/* Live Subtitles */}
         {(subtitle || translatedSubtitle) && (

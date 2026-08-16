@@ -1,25 +1,21 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
-import { Globe, ChevronDown, Languages } from 'lucide-react';
-import { SUPPORTED_LANGUAGES } from '@/hooks/useTranslation';
+import { ChevronDown, AudioLines } from 'lucide-react';
+import { useSpeechVoices } from '@/hooks/useTranslation';
 
-interface LanguageSelectorProps {
-  selectedLanguage: string | null;
-  onSelect: (lang: string | null) => void;
-  activeLabel?: (lang: string) => string;
-  placeholder?: string;
-  offLabel?: string;
+interface VoiceSelectorProps {
+  language: string | null;
+  selectedVoiceURI: string | null;
+  onSelect: (voiceURI: string | null) => void;
 }
 
-export function LanguageSelector({
-  selectedLanguage,
-  onSelect,
-  activeLabel = (lang) => `Translating to: ${lang}`,
-  placeholder = 'Select translation language',
-  offLabel = 'Off',
-}: LanguageSelectorProps) {
+export function VoiceSelector({ language, selectedVoiceURI, onSelect }: VoiceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const voices = useSpeechVoices(language);
+  const selected = voices.find((v) => v.voiceURI === selectedVoiceURI);
+
+  if (!voices.length) return null;
 
   return (
     <Card className="border-0 shadow-[var(--shadow-sm)] overflow-hidden">
@@ -29,11 +25,10 @@ export function LanguageSelector({
           className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
         >
           <div className="flex items-center gap-2">
-            <Languages className="w-4 h-4 text-primary" />
+            <AudioLines className="w-4 h-4 text-secondary" />
             <span className="text-sm font-body font-medium">
-              {selectedLanguage ? activeLabel(selectedLanguage) : placeholder}
+              {selected ? `Voice: ${selected.name}` : 'Voice: Automatic'}
             </span>
-
           </div>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
@@ -46,28 +41,28 @@ export function LanguageSelector({
               exit={{ height: 0 }}
               className="overflow-hidden"
             >
-              <div className="p-3 pt-0 grid grid-cols-3 gap-1.5">
+              <div className="p-3 pt-0 grid grid-cols-1 gap-1.5 max-h-56 overflow-y-auto">
                 <button
                   onClick={() => { onSelect(null); setIsOpen(false); }}
-                  className={`text-xs px-2 py-1.5 rounded-md font-body transition-colors ${
-                    !selectedLanguage
-                      ? 'bg-primary text-primary-foreground'
+                  className={`text-xs px-2 py-1.5 rounded-md font-body text-left transition-colors ${
+                    !selectedVoiceURI
+                      ? 'bg-secondary text-secondary-foreground'
                       : 'bg-muted/50 hover:bg-muted text-muted-foreground'
                   }`}
                 >
-                  {offLabel}
+                  Automatic (best match)
                 </button>
-                {SUPPORTED_LANGUAGES.map((lang) => (
+                {voices.map((v) => (
                   <button
-                    key={lang}
-                    onClick={() => { onSelect(lang); setIsOpen(false); }}
-                    className={`text-xs px-2 py-1.5 rounded-md font-body transition-colors ${
-                      selectedLanguage === lang
-                        ? 'bg-primary text-primary-foreground'
+                    key={v.voiceURI}
+                    onClick={() => { onSelect(v.voiceURI); setIsOpen(false); }}
+                    className={`text-xs px-2 py-1.5 rounded-md font-body text-left transition-colors ${
+                      selectedVoiceURI === v.voiceURI
+                        ? 'bg-secondary text-secondary-foreground'
                         : 'bg-muted/50 hover:bg-muted text-muted-foreground'
                     }`}
                   >
-                    {lang}
+                    {v.name} <span className="opacity-60">({v.lang})</span>
                   </button>
                 ))}
               </div>

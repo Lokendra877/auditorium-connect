@@ -11,7 +11,11 @@ interface TranscriptChunk {
 /* Speaker side: capture speech and broadcast it                       */
 /* ------------------------------------------------------------------ */
 
-export function useSpeechTranscription(sessionId: string | undefined, isSpeaking: boolean) {
+export function useSpeechTranscription(
+  sessionId: string | undefined,
+  isSpeaking: boolean,
+  sourceLanguage?: string | null
+) {
   const recognitionRef = useRef<any>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const activeRef = useRef(false);
@@ -69,7 +73,9 @@ export function useSpeechTranscription(sessionId: string | undefined, isSpeaking
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
-      recognition.lang = navigator.language || 'en-US';
+      recognition.lang = sourceLanguage
+        ? getLanguageCode(sourceLanguage)
+        : navigator.language || 'en-US';
 
       // Sends interim words as they arrive so listeners see text instantly.
       recognition.onresult = (event: any) => {
@@ -127,7 +133,7 @@ export function useSpeechTranscription(sessionId: string | undefined, isSpeaking
       recognitionRef.current = null;
       setIsTranscribing(false);
     };
-  }, [isSpeaking, sessionId, broadcast]);
+  }, [isSpeaking, sessionId, broadcast, sourceLanguage]);
 
   return { isTranscribing };
 }
@@ -139,7 +145,8 @@ export function useSpeechTranscription(sessionId: string | undefined, isSpeaking
 export function useTranscriptListener(
   sessionId: string | undefined,
   targetLanguage: string | null,
-  ttsEnabled: boolean = true
+  ttsEnabled: boolean = true,
+  voiceURI: string | null = null
 ) {
   const [subtitle, setSubtitle] = useState('');
   const [translatedSubtitle, setTranslatedSubtitle] = useState('');
@@ -147,8 +154,10 @@ export function useTranscriptListener(
 
   const langRef = useRef(targetLanguage);
   const ttsRef = useRef(ttsEnabled);
+  const voiceRef = useRef(voiceURI);
   useEffect(() => { langRef.current = targetLanguage; }, [targetLanguage]);
   useEffect(() => { ttsRef.current = ttsEnabled; }, [ttsEnabled]);
+  useEffect(() => { voiceRef.current = voiceURI; }, [voiceURI]);
 
   const interimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastRequestedRef = useRef('');
@@ -173,15 +182,23 @@ export function useTranscriptListener(
 
     const voices = window.speechSynthesis.getVoices();
     const base = code.split('-')[0];
+    const chosen = voiceRef.current
+      ? voices.find((v) => v.voiceURI === voiceRef.current)
+      : undefined;
     const voice =
+      chosen ||
       voices.find((v) => v.lang === code && !v.localService) ||
       voices.find((v) => v.lang === code) ||
       voices.find((v) => v.lang?.startsWith(base));
-    if (voice) utterance.voice = voice;
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang || code;
+    }
 
     // Don't cancel: queue utterances so sentences aren't cut off mid-word.
     window.speechSynthesis.speak(utterance);
   }, []);
+
 
   const translate = useCallback(
     async (text: string, lang: string, isFinal: boolean) => {
@@ -287,6 +304,33 @@ export function useTranscriptListener(
 
   return { subtitle, translatedSubtitle, isTranslating };
 }
+
+/* ------------------------------------------------------------------ */
+/* Available output voices, optionally filtered by language            */
+/* ------------------------------------------------------------------ */
+
+export function useSpeechVoices(language: string | null) {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    const load = () => setVoices(window.speechSynthesis.getVoices() || []);
+    load();
+    window.speechSynthesis.addEventListener?.('voiceschanged', load);
+    const t = setTimeout(load, 500);
+    return () => {
+      clearTimeout(t);
+      window.speechSynthesis.removeEventListener?.('voiceschanged', load);
+    };
+  }, []);
+
+  if (!language) return voices;
+  const base = getLanguageCode(language).split('-')[0];
+  const matching = voices.filter((v) => v.lang?.toLowerCase().startsWith(base));
+  return matching.length ? matching : voices;
+}
+
+
 
 function getLanguageCode(language: string): string {
   const map: Record<string, string> = {
