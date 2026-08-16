@@ -10,6 +10,7 @@ import { MicStatus } from '@/components/MicStatus';
 import { SpeakerTimer } from '@/components/SpeakerTimer';
 import { AudioStatus } from '@/components/AudioStatus';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { VoiceSelector } from '@/components/VoiceSelector';
 import { LiveSubtitles } from '@/components/LiveSubtitles';
 import { SessionPolls } from '@/components/SessionPolls';
 import { AudienceQuestions } from '@/components/AudienceQuestions';
