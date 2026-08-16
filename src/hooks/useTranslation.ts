@@ -145,7 +145,8 @@ export function useSpeechTranscription(
 export function useTranscriptListener(
   sessionId: string | undefined,
   targetLanguage: string | null,
-  ttsEnabled: boolean = true
+  ttsEnabled: boolean = true,
+  voiceURI: string | null = null
 ) {
   const [subtitle, setSubtitle] = useState('');
   const [translatedSubtitle, setTranslatedSubtitle] = useState('');
@@ -153,8 +154,10 @@ export function useTranscriptListener(
 
   const langRef = useRef(targetLanguage);
   const ttsRef = useRef(ttsEnabled);
+  const voiceRef = useRef(voiceURI);
   useEffect(() => { langRef.current = targetLanguage; }, [targetLanguage]);
   useEffect(() => { ttsRef.current = ttsEnabled; }, [ttsEnabled]);
+  useEffect(() => { voiceRef.current = voiceURI; }, [voiceURI]);
 
   const interimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastRequestedRef = useRef('');
@@ -179,15 +182,23 @@ export function useTranscriptListener(
 
     const voices = window.speechSynthesis.getVoices();
     const base = code.split('-')[0];
+    const chosen = voiceRef.current
+      ? voices.find((v) => v.voiceURI === voiceRef.current)
+      : undefined;
     const voice =
+      chosen ||
       voices.find((v) => v.lang === code && !v.localService) ||
       voices.find((v) => v.lang === code) ||
       voices.find((v) => v.lang?.startsWith(base));
-    if (voice) utterance.voice = voice;
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang || code;
+    }
 
     // Don't cancel: queue utterances so sentences aren't cut off mid-word.
     window.speechSynthesis.speak(utterance);
   }, []);
+
 
   const translate = useCallback(
     async (text: string, lang: string, isFinal: boolean) => {
