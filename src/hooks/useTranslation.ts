@@ -305,6 +305,33 @@ export function useTranscriptListener(
   return { subtitle, translatedSubtitle, isTranslating };
 }
 
+/* ------------------------------------------------------------------ */
+/* Available output voices, optionally filtered by language            */
+/* ------------------------------------------------------------------ */
+
+export function useSpeechVoices(language: string | null) {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    const load = () => setVoices(window.speechSynthesis.getVoices() || []);
+    load();
+    window.speechSynthesis.addEventListener?.('voiceschanged', load);
+    const t = setTimeout(load, 500);
+    return () => {
+      clearTimeout(t);
+      window.speechSynthesis.removeEventListener?.('voiceschanged', load);
+    };
+  }, []);
+
+  if (!language) return voices;
+  const base = getLanguageCode(language).split('-')[0];
+  const matching = voices.filter((v) => v.lang?.toLowerCase().startsWith(base));
+  return matching.length ? matching : voices;
+}
+
+
+
 function getLanguageCode(language: string): string {
   const map: Record<string, string> = {
     english: 'en-US',
