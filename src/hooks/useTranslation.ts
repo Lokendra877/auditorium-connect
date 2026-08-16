@@ -133,7 +133,7 @@ export function useSpeechTranscription(
       recognitionRef.current = null;
       setIsTranscribing(false);
     };
-  }, [isSpeaking, sessionId, broadcast]);
+  }, [isSpeaking, sessionId, broadcast, sourceLanguage]);
 
   return { isTranscribing };
 }
