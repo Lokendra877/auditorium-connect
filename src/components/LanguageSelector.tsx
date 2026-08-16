@@ -7,9 +7,18 @@ import { SUPPORTED_LANGUAGES } from '@/hooks/useTranslation';
 interface LanguageSelectorProps {
   selectedLanguage: string | null;
   onSelect: (lang: string | null) => void;
+  activeLabel?: (lang: string) => string;
+  placeholder?: string;
+  offLabel?: string;
 }
 
-export function LanguageSelector({ selectedLanguage, onSelect }: LanguageSelectorProps) {
+export function LanguageSelector({
+  selectedLanguage,
+  onSelect,
+  activeLabel = (lang) => `Translating to: ${lang}`,
+  placeholder = 'Select translation language',
+  offLabel = 'Off',
+}: LanguageSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -22,8 +31,9 @@ export function LanguageSelector({ selectedLanguage, onSelect }: LanguageSelecto
           <div className="flex items-center gap-2">
             <Languages className="w-4 h-4 text-primary" />
             <span className="text-sm font-body font-medium">
-              {selectedLanguage ? `Translating to: ${selectedLanguage}` : 'Select translation language'}
+              {selectedLanguage ? activeLabel(selectedLanguage) : placeholder}
             </span>
+
           </div>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
