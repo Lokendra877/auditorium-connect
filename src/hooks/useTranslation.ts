@@ -73,7 +73,9 @@ export function useSpeechTranscription(
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
-      recognition.lang = navigator.language || 'en-US';
+      recognition.lang = sourceLanguage
+        ? getLanguageCode(sourceLanguage)
+        : navigator.language || 'en-US';
 
       // Sends interim words as they arrive so listeners see text instantly.
       recognition.onresult = (event: any) => {
