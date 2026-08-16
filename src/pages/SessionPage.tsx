@@ -257,10 +257,21 @@ export default function SessionPage() {
         {/* Audio Status */}
         <AudioStatus isSpeaker={amISpeaking} isStreaming={isStreaming} isReceiving={isReceiving} micError={micError} />
 
-        {/* Language Selector */}
-        <div className="my-3">
+        {/* Language & voice settings */}
+        <div className="my-3 space-y-2">
           <LanguageSelector selectedLanguage={targetLanguage} onSelect={setTargetLanguage} />
+          {targetLanguage && (
+            <VoiceSelector language={targetLanguage} selectedVoiceURI={voiceURI} onSelect={setVoiceURI} />
+          )}
+          <LanguageSelector
+            selectedLanguage={spokenLanguage}
+            onSelect={setSpokenLanguage}
+            activeLabel={(lang) => `I speak: ${lang}`}
+            placeholder="I speak: Auto-detect (device language)"
+            offLabel="Auto"
+          />
         </div>
+
 
         {/* Live Subtitles */}
         {(subtitle || translatedSubtitle) && (
