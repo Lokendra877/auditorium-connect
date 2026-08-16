@@ -53,14 +53,17 @@ export default function SessionPage() {
   const [hasJoined, setHasJoined] = useState(!!savedName && !!savedEmail);
   const [targetLanguage, setTargetLanguage] = useState<string | null>(null);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [spokenLanguage, setSpokenLanguage] = useState<string | null>(null);
+  const [voiceURI, setVoiceURI] = useState<string | null>(null);
 
   const myEntry = useMemo(() => queue.find(e => e.device_id === deviceId), [queue, deviceId]);
   const amIModerator = (myEntry as any)?.is_moderator === true;
   const amISpeaking = myEntry?.status === 'speaking' || false;
   const { isStreaming, isReceiving, micError } = useWebRTC(sessionId, amISpeaking);
 
-  useSpeechTranscription(sessionId, amISpeaking);
-  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled);
+  useSpeechTranscription(sessionId, amISpeaking, spokenLanguage);
+  const { subtitle, translatedSubtitle, isTranslating } = useTranscriptListener(sessionId, targetLanguage, ttsEnabled, voiceURI);
+
 
   if (loading) {
     return (
