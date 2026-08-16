@@ -55,7 +55,7 @@ export function LanguageSelector({
                       : 'bg-muted/50 hover:bg-muted text-muted-foreground'
                   }`}
                 >
-                  Off
+                  {offLabel}
                 </button>
                 {SUPPORTED_LANGUAGES.map((lang) => (
                   <button
