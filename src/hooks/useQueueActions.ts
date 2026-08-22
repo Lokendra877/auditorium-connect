@@ -154,7 +154,7 @@ export function useQueueActions(sessionId: string | undefined) {
     if (!sessionId) return;
     const { data: next } = await supabase
       .from('speaker_queue')
-      .select('*')
+      .select('id')
       .eq('session_id', sessionId)
       .eq('status', 'waiting')
       .order('position', { ascending: true })

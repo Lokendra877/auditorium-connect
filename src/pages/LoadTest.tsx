@@ -99,7 +99,7 @@ export default function LoadTest() {
     start = performance.now();
     const { error: queueErr } = await supabase
       .from('speaker_queue')
-      .select('*')
+      .select('id, session_id, user_name, device_id, position, status')
       .eq('session_id', sessionId)
       .order('position', { ascending: true });
     metrics.push({
