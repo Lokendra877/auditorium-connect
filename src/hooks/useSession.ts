@@ -5,7 +5,10 @@ import type { Tables } from '@/integrations/supabase/types';
 export type Session = Omit<Tables<'sessions'>, 'admin_code'>;
 type QueueEntry = Tables<'speaker_queue'>;
 
-export function useSession(sessionId: string | undefined) {
+const QUEUE_PUBLIC_COLUMNS =
+  'id, session_id, user_name, device_id, position, status, requested_at, started_speaking_at, finished_speaking_at, is_moderator';
+
+export function useSession(sessionId: string | undefined, includeEmails = false) {
   const [session, setSession] = useState<Session | null>(null);
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,14 +26,16 @@ export function useSession(sessionId: string | undefined) {
 
   const fetchQueue = useCallback(async () => {
     if (!sessionId) return;
+    const columns = includeEmails ? `${QUEUE_PUBLIC_COLUMNS}, user_email` : QUEUE_PUBLIC_COLUMNS;
     const { data } = await supabase
       .from('speaker_queue')
-      .select('*')
+      .select(columns)
       .eq('session_id', sessionId)
       .in('status', ['waiting', 'speaking'])
       .order('position', { ascending: true });
-    if (data) setQueue(data);
-  }, [sessionId]);
+    if (data) setQueue(data as unknown as QueueEntry[]);
+  }, [sessionId, includeEmails]);
+
 
   useEffect(() => {
     fetchSession();
