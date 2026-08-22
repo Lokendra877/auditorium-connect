@@ -40,14 +40,18 @@ export function UserNotificationBell({ sessionId }: UserNotificationBellProps) {
         schema: 'public',
         table: 'user_notifications',
         filter: `device_id=eq.${deviceId}`,
-      }, (payload) => {
-        const n = payload.new as UserNotification;
-        setNotifications(prev => [n, ...prev]);
+      }, () => {
+        fetchNotifications();
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    // Realtime delivery can be filtered out by row-level security for
+    // anonymous devices, so poll as a fallback.
+    const interval = window.setInterval(fetchNotifications, 15000);
+
+    return () => { supabase.removeChannel(channel); window.clearInterval(interval); };
   }, [sessionId, deviceId]);
+
 
   const fetchNotifications = async () => {
     const { data } = await supabase
