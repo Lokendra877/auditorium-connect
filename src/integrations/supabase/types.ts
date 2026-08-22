@@ -408,10 +408,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_control_mic: { Args: { _session_id: string }; Returns: boolean }
+      can_manage_session: { Args: { _session_id: string }; Returns: boolean }
       create_quick_session: {
         Args: { p_speaking_time?: number; p_title: string }
         Returns: Json
       }
+      current_device_id: { Args: never; Returns: string }
+      is_session_moderator: { Args: { _session_id: string }; Returns: boolean }
+      is_session_owner: { Args: { _session_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
